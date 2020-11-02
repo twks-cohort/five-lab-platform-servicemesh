@@ -1,0 +1,84 @@
+---
+version: 2.1
+
+orbs:
+  terraform: feedyard/terraform@0.3.0
+
+executors:
+  infra-image:
+    docker:
+      - image: twdps/di-circleci-infra-image:stable
+        auth:
+          username: $DOCKER_USERNAME
+          password: $DOCKER_PASSWORD
+    shell: secrethub run -- /bin/sh -eo pipefail
+      
+on-push-master: &on-push-master
+  branches:
+    only: /master/
+  tags:
+    ignore: /.*/
+
+on-tag-master: &on-tag-master
+  branches:
+    ignore: /.*/
+  tags:
+    only: /.*/
+
+commands:
+  deploy-istio:
+    parameters:
+      cluster:
+        description: target kubernetes cluster
+        type: string
+        default: ""
+    steps:
+      - run:
+          name: pull kubeconfig
+          command: |
+            ls -la
+            mkdir ~/.kube
+            SECRETHUB_VAR_ENV=<< parameters.cluster >> secrethub inject -i tpl/kubeconfig.tpl -o ~/.kube/config
+      - run:
+          name: deploy istio with cluster specific values
+          command: bash tpl/deploy_istio.sh << parameters.cluster >>
+      - run:
+          name: deploy external dns
+          command: bash tpl/deploy_external_dns.sh << parameters.cluster >>
+      - run:
+          name: deploy monitoring traffic management
+          command: bash tpl/deploy_monitoring_traffic_management.sh << parameters.cluster >>
+      - run:
+          name: test istio deployment
+          command: CLUSTER=<< parameters.cluster >> bats test
+
+jobs:
+  deploy-servicemesh:
+    executor: infra-image
+    parameters:
+      cluster:
+        description: target kubernetes cluster
+        type: string
+        default: ""
+    steps:
+      - checkout
+      - setup_remote_docker
+      - deploy-istio:
+          cluster: << parameters.cluster >>
+
+workflows:
+  version: 2
+
+  poc-platform-servicemesh-pipeline:
+    jobs:
+      - deploy-servicemesh:
+          name: deploy-sandbox-servicemesh
+          context: twdps-di
+          cluster: sandbox
+          filters: *on-push-master
+      
+      - deploy-servicemesh:
+          name: deploy-preview-servicemesh
+          context: twdps-di
+          cluster: preview
+          filters: *on-tag-master
