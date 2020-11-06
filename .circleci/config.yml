@@ -30,7 +30,7 @@ commands:
         type: string
         default: ""
     steps:
-      - run: echo 'test'
+      - run: echo << parameters.msg >>
 
   # deploy-istio:
   #   parameters:
@@ -86,7 +86,7 @@ workflows:
     jobs:
       - my-job:
           msg: "world"
-          
+
       # - deploy-servicemesh:
       #     name: deploy-sandbox-servicemesh
       #     context: twdps-di
