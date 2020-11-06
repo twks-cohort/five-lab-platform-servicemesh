@@ -32,10 +32,6 @@ commands:
         description: target kubernetes cluster
         type: string
         default: ""
-      aws-account:
-        description: target aws account
-        type: string
-        default: ""
     steps:
       - run:
           name: pull kubeconfig
@@ -45,9 +41,6 @@ commands:
       - run:
           name: deploy istio with cluster specific values
           command: bash tpl/deploy_istio.sh << parameters.cluster >>
-      - run:
-          name: deploy external dns
-          command: bash tpl/deploy_external_dns.sh << parameters.cluster >> << parameters.aws-account >>
       # this creates external access to kiali, need to secure with better password, etc
       # - run:
       #     name: deploy monitoring traffic management
