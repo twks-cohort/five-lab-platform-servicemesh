@@ -8,22 +8,19 @@ executors:
   infra-image:
     docker:
       - image: twdps/di-circleci-infra-image:stable
-        auth:
-          username: $DOCKER_USERNAME
-          password: $DOCKER_PASSWORD
     shell: secrethub run -- /bin/sh -eo pipefail
       
-# on-push-master: &on-push-master
-#   branches:
-#     only: /master/
-#   tags:
-#     ignore: /.*/
+on-push-master: &on-push-master
+  branches:
+    only: /master/
+  tags:
+    ignore: /.*/
 
-# on-tag-master: &on-tag-master
-#   branches:
-#     ignore: /.*/
-#   tags:
-#     only: /.*/
+on-tag-master: &on-tag-master
+  branches:
+    ignore: /.*/
+  tags:
+    only: /.*/
 
 commands:
   deploy-istio:
@@ -49,7 +46,7 @@ commands:
           command: CLUSTER=<< parameters.cluster >> bats test
 
 jobs:
-  deploy-servicemesh:
+  deployservicemesh:
     executor: infra-image
     parameters:
       cluster:
@@ -67,18 +64,14 @@ workflows:
 
   poc-platform-servicemesh-pipeline:
     jobs:
-      - deploy-servicemesh:
+      - deployservicemesh:
           name: deploy-sandbox-servicemesh
           context: twdps-di
           cluster: sandbox
-          filters:
-            branches:
-              only: /master/
-            tags:
-              ignore: /.*/
+          filters: *on-push-master
       
-      # - deploy-servicemesh:
-      #     name: deploy-preview-servicemesh
-      #     context: twdps-di
-      #     cluster: preview
-      #     filters: *on-tag-master
+      - deploy-servicemesh:
+          name: deploy-preview-servicemesh
+          context: twdps-di
+          cluster: preview
+          filters: *on-tag-master
