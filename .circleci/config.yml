@@ -1,6 +1,9 @@
 ---
 version: 2.1
 
+orbs:
+  terraform: feedyard/terraform@0.3.0
+
 executors:
   infra-image:
     docker:
@@ -23,15 +26,6 @@ on-tag-master: &on-tag-master
     only: /.*/
 
 commands:
-  # hello:
-  #   parameters:
-  #     msg:
-  #       description: test
-  #       type: string
-  #       default: ""
-  #   steps:
-  #     - run: echo << parameters.msg >>
-
   deploy-istio:
     parameters:
       cluster:
@@ -47,26 +41,14 @@ commands:
       - run:
           name: deploy istio with cluster specific values
           command: bash tpl/deploy_istio.sh << parameters.cluster >>
-      # this creates external access to kiali, need to secure with better password, etc
-      # - run:
-      #     name: deploy monitoring traffic management
-      #     command: bash tpl/deploy_monitoring_traffic_management.sh << parameters.cluster >>
+      - run:
+          name: deploy external dns
+          command: bash tpl/deploy_external_dns.sh << parameters.cluster >>
       - run:
           name: test istio deployment
           command: CLUSTER=<< parameters.cluster >> bats test
 
 jobs:
-  # my-job:
-  #   executor: infra-image
-  #   parameters:
-  #     msg:
-  #       description: test
-  #       type: string
-  #       default: ""
-  #   steps:
-  #     - hello:
-  #         msg: << parameters.msg >>
-
   deploy-servicemesh:
     executor: infra-image
     parameters:
@@ -85,17 +67,14 @@ workflows:
 
   poc-platform-servicemesh-pipeline:
     jobs:
-      # - my-job:
-      #     msg: "world"
-
       - deploy-servicemesh:
           name: deploy-sandbox-servicemesh
           context: twdps-di
           cluster: sandbox
           filters: *on-push-master
       
-      # - deploy-servicemesh:
-      #     name: deploy-preview-servicemesh
-      #     context: twdps-di
-      #     cluster: preview
-      #     filters: *on-tag-master
+      - deploy-servicemesh:
+          name: deploy-preview-servicemesh
+          context: twdps-di
+          cluster: preview
+          filters: *on-tag-master
