@@ -1,1 +1,1 @@
-{{ .../env/$env/cluster/kubeconfig }}
+{{ twdps/di/platform/env/$env/cluster/kubeconfig }}

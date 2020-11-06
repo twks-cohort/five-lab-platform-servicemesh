@@ -32,11 +32,14 @@ commands:
         description: target kubernetes cluster
         type: string
         default: ""
+      aws-account:
+        description: target aws account
+        type: string
+        default: ""
     steps:
       - run:
           name: pull kubeconfig
           command: |
-            ls -la
             mkdir ~/.kube
             SECRETHUB_VAR_ENV=<< parameters.cluster >> secrethub inject -i tpl/kubeconfig.tpl -o ~/.kube/config
       - run:
@@ -44,10 +47,11 @@ commands:
           command: bash tpl/deploy_istio.sh << parameters.cluster >>
       - run:
           name: deploy external dns
-          command: bash tpl/deploy_external_dns.sh << parameters.cluster >>
-      - run:
-          name: deploy monitoring traffic management
-          command: bash tpl/deploy_monitoring_traffic_management.sh << parameters.cluster >>
+          command: bash tpl/deploy_external_dns.sh << parameters.cluster >> << parameters.aws-account >>
+      # this creates external access to kiali, need to secure with better password, etc
+      # - run:
+      #     name: deploy monitoring traffic management
+      #     command: bash tpl/deploy_monitoring_traffic_management.sh << parameters.cluster >>
       - run:
           name: test istio deployment
           command: CLUSTER=<< parameters.cluster >> bats test

@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+export CLUSTER=${1}
 
 cat <<EOF > monitoring-traffic-management.yaml
 apiVersion: networking.istio.io/v1alpha3
@@ -15,7 +16,7 @@ spec:
         name: http
         protocol: HTTP
       hosts:
-        - "monitoring.$1.twdps.io"
+        - "istio-system.$CLUSTER.twdps.io"
 ---
 apiVersion: networking.istio.io/v1alpha3
 kind: VirtualService
@@ -24,13 +25,13 @@ metadata:
   namespace: istio-system
 spec:
   hosts:
-    - "monitoring.$1.twdps.io"
+    - "istio-system.$CLUSTER.twdps.io"
   gateways:
     - monitoring-gateway
   http:
     - match:
         - uri:
-            prefix: /kiali
+            prefix: /kiali/
       route:
       - destination:
           host: kiali

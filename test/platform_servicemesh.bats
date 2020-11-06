@@ -41,8 +41,3 @@
   run bash -c "kubectl get pods -n istio-system -o wide | grep 'kiali'"
   [[ "${output}" =~ "Running" ]]
 }
-
-@test "validate external dns setup for monitoring with resource routing" {
-    run bash -c "curl -X GET monitoring.$CLUSTER.twdps.io/kiali/ -w %{http_code}"
-    [[ "${output}" =~ "200" ]]
-}
