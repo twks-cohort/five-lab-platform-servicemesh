@@ -57,7 +57,7 @@ commands:
 
 jobs:
   my-job:
-    exeecutor: infra-image
+    executor: infra-image
     parameters:
       msg:
         description: test
