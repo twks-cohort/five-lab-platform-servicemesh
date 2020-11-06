@@ -1,26 +1,23 @@
 ---
 version: 2.1
 
-orbs:
-  terraform: feedyard/terraform@0.3.0
-
 executors:
   infra-image:
     docker:
       - image: twdps/di-circleci-infra-image:stable
     shell: secrethub run -- /bin/sh -eo pipefail
       
-on-push-master: &on-push-master
-  branches:
-    only: /master/
-  tags:
-    ignore: /.*/
+# on-push-master: &on-push-master
+#   branches:
+#     only: /master/
+#   tags:
+#     ignore: /.*/
 
-on-tag-master: &on-tag-master
-  branches:
-    ignore: /.*/
-  tags:
-    only: /.*/
+# on-tag-master: &on-tag-master
+#   branches:
+#     ignore: /.*/
+#   tags:
+#     only: /.*/
 
 commands:
   deploy-istio:
@@ -68,10 +65,10 @@ workflows:
           name: deploy-sandbox-servicemesh
           context: twdps-di
           cluster: sandbox
-          filters: *on-push-master
+          #filters: *on-push-master
       
-      - deployservicemesh:
-          name: deploy-preview-servicemesh
-          context: twdps-di
-          cluster: preview
-          filters: *on-tag-master
+      # - deployservicemesh:
+      #     name: deploy-preview-servicemesh
+      #     context: twdps-di
+      #     cluster: preview
+      #     filters: *on-tag-master
