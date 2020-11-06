@@ -70,7 +70,7 @@ workflows:
           cluster: sandbox
           filters: *on-push-master
       
-      - deploy-servicemesh:
+      - deployservicemesh:
           name: deploy-preview-servicemesh
           context: twdps-di
           cluster: preview
