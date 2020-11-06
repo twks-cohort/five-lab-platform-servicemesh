@@ -13,17 +13,17 @@ executors:
           password: $DOCKER_PASSWORD
     shell: secrethub run -- /bin/sh -eo pipefail
       
-on-push-master: &on-push-master
-  branches:
-    only: /master/
-  tags:
-    ignore: /.*/
+# on-push-master: &on-push-master
+#   branches:
+#     only: /master/
+#   tags:
+#     ignore: /.*/
 
-on-tag-master: &on-tag-master
-  branches:
-    ignore: /.*/
-  tags:
-    only: /.*/
+# on-tag-master: &on-tag-master
+#   branches:
+#     ignore: /.*/
+#   tags:
+#     only: /.*/
 
 commands:
   deploy-istio:
@@ -71,10 +71,14 @@ workflows:
           name: deploy-sandbox-servicemesh
           context: twdps-di
           cluster: sandbox
-          filters: *on-push-master
+          filters:
+            branches:
+              only: /master/
+            tags:
+              ignore: /.*/
       
-      - deploy-servicemesh:
-          name: deploy-preview-servicemesh
-          context: twdps-di
-          cluster: preview
-          filters: *on-tag-master
+      # - deploy-servicemesh:
+      #     name: deploy-preview-servicemesh
+      #     context: twdps-di
+      #     cluster: preview
+      #     filters: *on-tag-master
