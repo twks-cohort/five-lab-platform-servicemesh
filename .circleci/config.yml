@@ -1,9 +1,6 @@
 ---
 version: 2.1
 
-orbs:
-  terraform: feedyard/terraform@0.3.0
-
 executors:
   infra-image:
     docker:
