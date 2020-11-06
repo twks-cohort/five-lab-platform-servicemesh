@@ -7,11 +7,11 @@ executors:
       - image: twdps/di-circleci-infra-image:stable
     shell: secrethub run -- /bin/sh -eo pipefail
       
-# on-push-master: &on-push-master
-#   branches:
-#     only: /master/
-#   tags:
-#     ignore: /.*/
+on-push-master: &on-push-master
+  branches:
+    only: /master/
+  tags:
+    ignore: /.*/
 
 # on-tag-master: &on-tag-master
 #   branches:
@@ -35,9 +35,6 @@ commands:
       - run:
           name: deploy istio with cluster specific values
           command: bash tpl/deploy_istio.sh << parameters.cluster >>
-      - run:
-          name: deploy external dns
-          command: bash tpl/deploy_external_dns.sh << parameters.cluster >>
       - run:
           name: test istio deployment
           command: CLUSTER=<< parameters.cluster >> bats test
@@ -65,7 +62,7 @@ workflows:
           name: deploy-sandbox-servicemesh
           context: twdps-di
           cluster: sandbox
-          #filters: *on-push-master
+          filters: *on-push-master
       
       # - deployservicemesh:
       #     name: deploy-preview-servicemesh
