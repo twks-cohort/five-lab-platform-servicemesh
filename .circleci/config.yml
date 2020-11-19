@@ -55,13 +55,13 @@ commands:
           command: bash tpl/deploy_development_namespaces.sh di-dev
       - run:
           name: test namespace for di-dev
-          command: NAMESPACE="di-dev" bats dev_namespacest.bats
+          command: NAMESPACE="di-dev" bats test/dev_namespaces.bats
       - run:
           name: deploy namespace for di-staging
           command: bash tpl/deploy_development_namespaces.sh di-staging
       - run:
           name: test namespace for di-staging
-          command: NAMESPACE="di-dev" bats dev_namespacest.bats
+          command: NAMESPACE="di-dev" bats test/dev_namespaces.bats
       - run:
           name: deploy api traffic management for di-dev
           command: bash tpl/deploy_api_traffic_management.sh << parameters.cluster >> di-dev
