@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 # need to parameterize the account-id
-export AWS_ACCOUNT_ID=$(secrethub read twdps/di/svc/aws/{{}}/aws-account-id)
+export AWS_ACCOUNT_ID=$(secrethub read twdps/di/svc/aws/dps-2/aws-account-id)
 
 aws sts assume-role --output json --role-arn arn:aws:iam::$AWS_ACCOUNT_ID:role/DPSTerraformRole --role-session-name deploy-external-dns-session >credentials
 export AWS_ACCESS_KEY_ID=$(cat credentials | jq -r ".Credentials.AccessKeyId")
