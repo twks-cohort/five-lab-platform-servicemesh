@@ -51,6 +51,18 @@ commands:
           name: deploy monitoring traffic management
           command: bash tpl/deploy_monitoring_traffic_management.sh << parameters.cluster >>
       - run:
+          name: deploy namespace for di-dev
+          command: bash tpl/deploy_development_namespaces.sh di-dev
+      - run:
+          name: test namespace for di-dev
+          command: NAMESPACE="di-dev" bats dev_namespacest.bats
+      - run:
+          name: deploy namespace for di-staging
+          command: bash tpl/deploy_development_namespaces.sh di-staging
+      - run:
+          name: test namespace for di-staging
+          command: NAMESPACE="di-dev" bats dev_namespacest.bats
+      - run:
           name: deploy api traffic management for di-dev
           command: bash tpl/deploy_api_traffic_management.sh << parameters.cluster >> di-dev
       - run:
