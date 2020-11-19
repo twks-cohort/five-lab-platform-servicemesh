@@ -51,8 +51,8 @@ metadata:
     app: kiali
     app.kubernetes.io/name: kiali
     app.kubernetes.io/instance: kiali-server
-    version: "v$CLUSTER"
-    app.kubernetes.io/version: "v$CLUSTER"
+    version: "v$KIALI_VERSION"
+    app.kubernetes.io/version: "v$KIALI_VERSION"
     app.kubernetes.io/managed-by: Helm
 ...
 ---
@@ -67,8 +67,8 @@ metadata:
     app: kiali
     app.kubernetes.io/name: kiali
     app.kubernetes.io/instance: kiali-server
-    version: "v$CLUSTER"
-    app.kubernetes.io/version: "v$CLUSTER"
+    version: "v$KIALI_VERSION"
+    app.kubernetes.io/version: "v$KIALI_VERSION"
     app.kubernetes.io/managed-by: Helm
 data:
   config.yaml: |
@@ -130,7 +130,7 @@ data:
       service_type: ""
       tolerations: []
       verbose_mode: "3"
-      version_label: "v$CLUSTER"
+      version_label: "v$KIALI_VERSION"
       view_only_mode: false
     extensions:
       iter_8:
@@ -247,8 +247,8 @@ metadata:
     app: kiali
     app.kubernetes.io/name: kiali
     app.kubernetes.io/instance: kiali-server
-    version: "v$CLUSTER"
-    app.kubernetes.io/version: "v$CLUSTER"
+    version: "v$KIALI_VERSION"
+    app.kubernetes.io/version: "v$KIALI_VERSION"
     app.kubernetes.io/managed-by: Helm
 rules:
 - apiGroups: [""]
@@ -355,8 +355,8 @@ metadata:
     app: kiali
     app.kubernetes.io/name: kiali
     app.kubernetes.io/instance: kiali-server
-    version: "v$CLUSTER"
-    app.kubernetes.io/version: "v$CLUSTER"
+    version: "v$KIALI_VERSION"
+    app.kubernetes.io/version: "v$KIALI_VERSION"
     app.kubernetes.io/managed-by: Helm
 rules:
 - apiGroups: [""]
@@ -480,8 +480,8 @@ metadata:
     app: kiali
     app.kubernetes.io/name: kiali
     app.kubernetes.io/instance: kiali-server
-    version: "v$CLUSTER"
-    app.kubernetes.io/version: "v$CLUSTER"
+    version: "v$KIALI_VERSION"
+    app.kubernetes.io/version: "v$KIALI_VERSION"
     app.kubernetes.io/managed-by: Helm
 roleRef:
   apiGroup: rbac.authorization.k8s.io
@@ -504,8 +504,8 @@ metadata:
     app: kiali
     app.kubernetes.io/name: kiali
     app.kubernetes.io/instance: kiali-server
-    version: "v$CLUSTER"
-    app.kubernetes.io/version: "v$CLUSTER"
+    version: "v$KIALI_VERSION"
+    app.kubernetes.io/version: "v$KIALI_VERSION"
     app.kubernetes.io/managed-by: Helm
   annotations:
     kiali.io/api-spec: https://kiali.io/api
@@ -534,8 +534,8 @@ metadata:
     app: kiali
     app.kubernetes.io/name: kiali
     app.kubernetes.io/instance: kiali-server
-    version: "v$CLUSTER"
-    app.kubernetes.io/version: "v$CLUSTER"
+    version: "v$KIALI_VERSION"
+    app.kubernetes.io/version: "v$KIALI_VERSION"
     app.kubernetes.io/managed-by: Helm
 spec:
   replicas: 1
@@ -556,8 +556,8 @@ spec:
         app: kiali
         app.kubernetes.io/name: kiali
         app.kubernetes.io/instance: kiali-server
-        version: "v$CLUSTER"
-        app.kubernetes.io/version: "v$CLUSTER"
+        version: "v$KIALI_VERSION"
+        app.kubernetes.io/version: "v$KIALI_VERSION"
         app.kubernetes.io/managed-by: Helm
       annotations:
         prometheus.io/scrape: "true"
@@ -566,7 +566,7 @@ spec:
     spec:
       serviceAccountName: kiali
       containers:
-      - image: "quay.io/kiali/kiali:v$CLUSTER"
+      - image: "quay.io/kiali/kiali:v$KIALI_VERSION"
         imagePullPolicy: Always
         name: kiali
         command:
@@ -630,8 +630,8 @@ metadata:
     app: kiali
     app.kubernetes.io/name: kiali
     app.kubernetes.io/instance: kiali-server
-    version: "v$CLUSTER"
-    app.kubernetes.io/version: "v$CLUSTER"
+    version: "v$KIALI_VERSION"
+    app.kubernetes.io/version: "v$KIALI_VERSION"
     app.kubernetes.io/managed-by: Helm
 spec:
   title: Envoy Metrics
@@ -690,8 +690,8 @@ metadata:
     app: kiali
     app.kubernetes.io/name: kiali
     app.kubernetes.io/instance: kiali-server
-    version: "v$CLUSTER"
-    app.kubernetes.io/version: "v$CLUSTER"
+    version: "v$KIALI_VERSION"
+    app.kubernetes.io/version: "v$KIALI_VERSION"
     app.kubernetes.io/managed-by: Helm
 spec:
   title: Go Metrics
@@ -761,8 +761,8 @@ metadata:
     app: kiali
     app.kubernetes.io/name: kiali
     app.kubernetes.io/instance: kiali-server
-    version: "v$CLUSTER"
-    app.kubernetes.io/version: "v$CLUSTER"
+    version: "v$KIALI_VERSION"
+    app.kubernetes.io/version: "v$KIALI_VERSION"
     app.kubernetes.io/managed-by: Helm
 spec:
   title: Kiali Internal Metrics
@@ -809,8 +809,8 @@ metadata:
     app: kiali
     app.kubernetes.io/name: kiali
     app.kubernetes.io/instance: kiali-server
-    version: "v$CLUSTER"
-    app.kubernetes.io/version: "v$CLUSTER"
+    version: "v$KIALI_VERSION"
+    app.kubernetes.io/version: "v$KIALI_VERSION"
     app.kubernetes.io/managed-by: Helm
 spec:
   runtime: JVM
@@ -856,8 +856,8 @@ metadata:
     app: kiali
     app.kubernetes.io/name: kiali
     app.kubernetes.io/instance: kiali-server
-    version: "v$CLUSTER"
-    app.kubernetes.io/version: "v$CLUSTER"
+    version: "v$KIALI_VERSION"
+    app.kubernetes.io/version: "v$KIALI_VERSION"
     app.kubernetes.io/managed-by: Helm
 spec:
   runtime: JVM
@@ -925,8 +925,8 @@ metadata:
     app: kiali
     app.kubernetes.io/name: kiali
     app.kubernetes.io/instance: kiali-server
-    version: "v$CLUSTER"
-    app.kubernetes.io/version: "v$CLUSTER"
+    version: "v$KIALI_VERSION"
+    app.kubernetes.io/version: "v$KIALI_VERSION"
     app.kubernetes.io/managed-by: Helm
 spec:
   runtime: JVM
@@ -997,8 +997,8 @@ metadata:
     app: kiali
     app.kubernetes.io/name: kiali
     app.kubernetes.io/instance: kiali-server
-    version: "v$CLUSTER"
-    app.kubernetes.io/version: "v$CLUSTER"
+    version: "v$KIALI_VERSION"
+    app.kubernetes.io/version: "v$KIALI_VERSION"
     app.kubernetes.io/managed-by: Helm
 spec:
   title: MicroProfile Metrics
@@ -1060,8 +1060,8 @@ metadata:
     app: kiali
     app.kubernetes.io/name: kiali
     app.kubernetes.io/instance: kiali-server
-    version: "v$CLUSTER"
-    app.kubernetes.io/version: "v$CLUSTER"
+    version: "v$KIALI_VERSION"
+    app.kubernetes.io/version: "v$KIALI_VERSION"
     app.kubernetes.io/managed-by: Helm
 spec:
   title: MicroProfile Metrics
@@ -1102,8 +1102,8 @@ metadata:
     app: kiali
     app.kubernetes.io/name: kiali
     app.kubernetes.io/instance: kiali-server
-    version: "v$CLUSTER"
-    app.kubernetes.io/version: "v$CLUSTER"
+    version: "v$KIALI_VERSION"
+    app.kubernetes.io/version: "v$KIALI_VERSION"
     app.kubernetes.io/managed-by: Helm
 spec:
   runtime: Node.js
@@ -1165,8 +1165,8 @@ metadata:
     app: kiali
     app.kubernetes.io/name: kiali
     app.kubernetes.io/instance: kiali-server
-    version: "v$CLUSTER"
-    app.kubernetes.io/version: "v$CLUSTER"
+    version: "v$KIALI_VERSION"
+    app.kubernetes.io/version: "v$KIALI_VERSION"
     app.kubernetes.io/managed-by: Helm
 spec:
   title: Quarkus Metrics
@@ -1202,8 +1202,8 @@ metadata:
     app: kiali
     app.kubernetes.io/name: kiali
     app.kubernetes.io/instance: kiali-server
-    version: "v$CLUSTER"
-    app.kubernetes.io/version: "v$CLUSTER"
+    version: "v$KIALI_VERSION"
+    app.kubernetes.io/version: "v$KIALI_VERSION"
     app.kubernetes.io/managed-by: Helm
 spec:
   runtime: Spring Boot
@@ -1222,8 +1222,8 @@ metadata:
     app: kiali
     app.kubernetes.io/name: kiali
     app.kubernetes.io/instance: kiali-server
-    version: "v$CLUSTER"
-    app.kubernetes.io/version: "v$CLUSTER"
+    version: "v$KIALI_VERSION"
+    app.kubernetes.io/version: "v$KIALI_VERSION"
     app.kubernetes.io/managed-by: Helm
 spec:
   runtime: Spring Boot
@@ -1242,8 +1242,8 @@ metadata:
     app: kiali
     app.kubernetes.io/name: kiali
     app.kubernetes.io/instance: kiali-server
-    version: "v$CLUSTER"
-    app.kubernetes.io/version: "v$CLUSTER"
+    version: "v$KIALI_VERSION"
+    app.kubernetes.io/version: "v$KIALI_VERSION"
     app.kubernetes.io/managed-by: Helm
 spec:
   runtime: Spring Boot
@@ -1262,8 +1262,8 @@ metadata:
     app: kiali
     app.kubernetes.io/name: kiali
     app.kubernetes.io/instance: kiali-server
-    version: "v$CLUSTER"
-    app.kubernetes.io/version: "v$CLUSTER"
+    version: "v$KIALI_VERSION"
+    app.kubernetes.io/version: "v$KIALI_VERSION"
     app.kubernetes.io/managed-by: Helm
 spec:
   runtime: Thorntail
@@ -1288,8 +1288,8 @@ metadata:
     app: kiali
     app.kubernetes.io/name: kiali
     app.kubernetes.io/instance: kiali-server
-    version: "v$CLUSTER"
-    app.kubernetes.io/version: "v$CLUSTER"
+    version: "v$KIALI_VERSION"
+    app.kubernetes.io/version: "v$KIALI_VERSION"
     app.kubernetes.io/managed-by: Helm
 spec:
   runtime: Tomcat
@@ -1359,8 +1359,8 @@ metadata:
     app: kiali
     app.kubernetes.io/name: kiali
     app.kubernetes.io/instance: kiali-server
-    version: "v$CLUSTER"
-    app.kubernetes.io/version: "v$CLUSTER"
+    version: "v$KIALI_VERSION"
+    app.kubernetes.io/version: "v$KIALI_VERSION"
     app.kubernetes.io/managed-by: Helm
 spec:
   runtime: Vert.x
@@ -1423,8 +1423,8 @@ metadata:
     app: kiali
     app.kubernetes.io/name: kiali
     app.kubernetes.io/instance: kiali-server
-    version: "v$CLUSTER"
-    app.kubernetes.io/version: "v$CLUSTER"
+    version: "v$KIALI_VERSION"
+    app.kubernetes.io/version: "v$KIALI_VERSION"
     app.kubernetes.io/managed-by: Helm
 spec:
   runtime: Vert.x
@@ -1486,8 +1486,8 @@ metadata:
     app: kiali
     app.kubernetes.io/name: kiali
     app.kubernetes.io/instance: kiali-server
-    version: "v$CLUSTER"
-    app.kubernetes.io/version: "v$CLUSTER"
+    version: "v$KIALI_VERSION"
+    app.kubernetes.io/version: "v$KIALI_VERSION"
     app.kubernetes.io/managed-by: Helm
 spec:
   runtime: Vert.x
@@ -1506,8 +1506,8 @@ metadata:
     app: kiali
     app.kubernetes.io/name: kiali
     app.kubernetes.io/instance: kiali-server
-    version: "v$CLUSTER"
-    app.kubernetes.io/version: "v$CLUSTER"
+    version: "v$KIALI_VERSION"
+    app.kubernetes.io/version: "v$KIALI_VERSION"
     app.kubernetes.io/managed-by: Helm
 spec:
   runtime: Vert.x
@@ -1578,8 +1578,8 @@ metadata:
     app: kiali
     app.kubernetes.io/name: kiali
     app.kubernetes.io/instance: kiali-server
-    version: "v$CLUSTER"
-    app.kubernetes.io/version: "v$CLUSTER"
+    version: "v$KIALI_VERSION"
+    app.kubernetes.io/version: "v$KIALI_VERSION"
     app.kubernetes.io/managed-by: Helm
 spec:
   runtime: Vert.x
