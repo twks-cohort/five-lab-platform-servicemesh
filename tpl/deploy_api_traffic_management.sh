@@ -1,58 +1,85 @@
 #!/usr/bin/env bash
 
 export cluster=$1
-export namespace=$2
+export environ=$2
 if [[ $cluster == 'preview' ]]; then
-  if [[ $namespace == 'di-dev' ]]; then
+  if [[ $environ == 'di-dev' ]]; then
     host='dev.twdps.io'
-  elif [[ $namespace == 'di-staging' ]]; then
+  elif [[ $environ == 'di-staging' ]]; then
     host='api.twdps.io'
   fi
 fi
 
 if [[ $cluster == 'sandbox' ]]; then
-  if [[ $namespace == 'di-dev' ]]; then
+  if [[ $environ == 'di-dev' ]]; then
     host="dev.$cluster.twdps.io"
-  elif [[ $namespace == 'di-staging' ]]; then
+  elif [[ $environ == 'di-staging' ]]; then
     host="api.$cluster.twdps.io"
   fi
 fi
 
-cat <<EOF > api-traffic-management.yaml
+# star cert for default gateways
+
+
+# each cluster will have default gateways for each of the ingressgateways
+# gateway_source = [ internal | external | external-whitelist ]
+
+for GATEWAY_SOURCE in internal external external-whitelist
+do
+cat <<EOF > gateway-default-$GATEWAY_SOURCE.yaml
+---
 apiVersion: networking.istio.io/v1alpha3
 kind: Gateway
 metadata:
-  name: api-gateway
+  name: $GATEWAY_SOURCE-gateway
+  namespace: istio-system
+  labels:
+    app: istio-ingressgateway
+    istio: $GATEWAY_SOURCE-ingressgateway
 spec:
   selector:
-    istio: ingressgateway
+    istio: $GATEWAY_SOURCE-ingressgateway
   servers:
   - port:
-      number: 80
-      name: http
-      protocol: HTTP
+      number: 443
+      name: https-$GATEWAY_SOURCE
+      protocol: HTTPS
+    tls:
+      mode: SIMPLE
+      credentialName: star.$cluster-cert
     hosts:
-    - "$host"
-# ---
-# apiVersion: networking.istio.io/v1alpha3
-# kind: VirtualService
-# metadata:
-#   name: api-virtual-service
-# spec:
-#   hosts:
-#   - "$host"
-#   gateways:
-#   - api-gateway
-#   http:
-#     - match:
-#       - uri:
-#           prefix: /teams
-#       route:
-#       - destination:
-#           host: poc-va-api
-#           port:
-#             number: 5000
+    - '*'
 EOF
-kubectl apply -f api-traffic-management.yaml -n $2
+# kubectl apply -f gateway-default-$GATEWAY_SOURCE.yaml
+done 
 
-sleep 10
+
+
+# 
+for GATEWAY_SOURCE in internal external external-whitelist
+do
+cat <<EOF > gateway-$environ-$GATEWAY_SOURCE.yaml
+apiVersion: networking.istio.io/v1alpha3
+kind: Gateway
+metadata:
+  name: $GATEWAY_SOURCE-$environ-gateway
+  namespace: istio-system
+spec:
+  selector:
+    istio: $GATEWAY_SOURCE-ingressgateway
+  servers:
+  - port:
+      number: 443
+      name: https-api-$environ-twdps.di-name
+      protocol: HTTPS
+    tls:
+      mode: SIMPLE
+      credentialName: $environ.twdps.di-cert
+    hosts:
+      - "$host"
+
+EOF
+# kubectl apply -f gateway-$environ-$GATEWAY_SOURCE.yaml
+done 
+
+

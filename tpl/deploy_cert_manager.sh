@@ -11,4 +11,4 @@ kubectl apply --validate=false -f https://github.com/jetstack/cert-manager/relea
 
 kubectl apply --validate=false -f https://github.com/jetstack/cert-manager/releases/download/v${CERT_MANAGER_VERSION}/cert-manager.crds.yaml
 
-https://github.com/jetstack/cert-manager/releases/download/v1.0.3/cert-manager.yaml
+#https://github.com/jetstack/cert-manager/releases/download/v1.0.3/cert-manager.yaml

@@ -48,6 +48,12 @@ commands:
           name: test httpbin traffic
           command: CLUSTER=<< parameters.cluster >> bats test/platform_httpbin.bats
       - run:
+          name: deploy cert-manager
+          command: bash tpl/deploy_cert_manager.sh << parameters.cluster >>
+      - run:
+          name: deploy certificates
+          command: bash tpl/deploy_certificates.sh << parameters.cluster >>          
+      - run:
           name: deploy monitoring traffic management
           command: bash tpl/deploy_monitoring_traffic_management.sh << parameters.cluster >>
       - run:
@@ -71,12 +77,7 @@ commands:
       - run:
           name: test traffic management
           command: CLUSTER=<< parameters.cluster >> bats test/platform_traffic_management.bats
-      - run:
-          name: deploy cert-manager
-          command: bash tpl/deploy_cert_manager.sh << parameters.cluster >>
-      - run:
-          name: deploy certificates
-          command: bash tpl/deploy_certificates.sh << parameters.cluster >>
+
 
 
 jobs:
