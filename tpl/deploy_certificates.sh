@@ -1,7 +1,11 @@
 #!/usr/bin/env bash
 
 export AWS_ACCOUNT_ID=$(secrethub read twdps/di/svc/aws/dps-2/aws-account-id )
+export CM_AWS_ACCESS_KEY_ID=$(secrethub read twdps/di/svc/aws/dps-2/DPSSimpleServiceAccount/aws-access-key-id)
+export CM_AWS_SECRET_ACCESS_KEY=$(secrethub read twdps/di/svc/aws/dps-2/DPSSimpleServiceAccount/aws-secret-access-key)
 export EMAIL=$(secrethub read twdps/di/svc/gmail/email)
+
+kubectl create secret generic twdps.io-${1}-secret -n cert-manager --from-literal=secret-access-key=$CM_AWS_SECRET_ACCESS_KEY
 
 aws sts assume-role --output json --role-arn arn:aws:iam::$AWS_ACCOUNT_ID:role/DPSTerraformRole --role-session-name deploy-external-dns-session >credentials
 export AWS_ACCESS_KEY_ID=$(cat credentials | jq -r ".Credentials.AccessKeyId")
@@ -89,6 +93,7 @@ apiVersion: cert-manager.io/v1
 kind: ClusterIssuer
 metadata:
   name: twdps.io-${1}
+  namespace: cert-manager
 spec:
   acme:
     email: $EMAIL
@@ -98,9 +103,10 @@ spec:
     solvers:
     - selector:
         dnsZones:
-          - "twdps.io"
+          - "$cluster.twdps.io"
       dns01:
         route53:
+          accessKeyID: $CM_AWS_ACCESS_KEY_ID
           region: $AWS_DEFAULT_REGION
           hostedZoneID: $HOSTED_ZONE_ID # optional, see policy above
           role: arn:aws:iam::${AWS_ACCOUNT_ID}:role/${1}-external-dns
@@ -116,8 +122,8 @@ spec:
     name: twdps.io-${1}
     kind: ClusterIssuer
   dnsNames:
-  - '*.twdps.io'
-  - twdps.io
+  - '*.$cluster.twdps.io'
+  - '$cluster.twdps.io'
 EOF
 
 kubectl apply -f certificate_configuration.yaml
