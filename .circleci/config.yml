@@ -50,9 +50,9 @@ commands:
       - run:
           name: deploy cert-manager
           command: bash tpl/deploy_cert_manager.sh << parameters.cluster >>
-      - run:
-          name: deploy certificates
-          command: bash tpl/deploy_certificates.sh << parameters.cluster >>          
+      # - run:
+      #     name: deploy certificates
+      #     command: bash tpl/deploy_certificates.sh << parameters.cluster >>          
       - run:
           name: deploy monitoring traffic management
           command: bash tpl/deploy_monitoring_traffic_management.sh << parameters.cluster >>
@@ -97,7 +97,7 @@ jobs:
 workflows:
   version: 2
 
-  poc-platform-servicemesh-pipeline:
+  lab-platform-servicemesh-pipeline:
     jobs:
       - deployservicemesh:
           name: deploy-sandbox-servicemesh

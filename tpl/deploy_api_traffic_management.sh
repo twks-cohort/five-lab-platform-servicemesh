@@ -50,7 +50,7 @@ spec:
     hosts:
     - '*'
 EOF
-# kubectl apply -f gateway-default-$GATEWAY_SOURCE.yaml
+kubectl apply -f gateway-default-$GATEWAY_SOURCE.yaml
 done 
 
 
@@ -79,7 +79,7 @@ spec:
       - "$host"
 
 EOF
-# kubectl apply -f gateway-$environ-$GATEWAY_SOURCE.yaml
+kubectl apply -f gateway-$environ-$GATEWAY_SOURCE.yaml
 done 
 
 

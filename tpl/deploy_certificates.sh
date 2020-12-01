@@ -38,7 +38,7 @@ create_dev_cert () {
 cat <<EOF >gateway-environment-cert-$environ.yaml
 ---
 # Wildcard Certificate for Gateways specific to logical environment
-apiVersion: cert-manager.io/v1alpha2
+apiVersion: cert-manager.io/v1
 kind: Certificate
 metadata:
   name: $environ.twdps.di-cert
@@ -50,7 +50,7 @@ spec:
     kind: Issuer
   dnsNames:
   - '$api_host'
-  - '$environ.twdps.di'
+  - '$environ.twdps.io'
   # acme:
   #   config:
   #   - dns01:
@@ -67,7 +67,7 @@ create_prod_cert () {
 cat <<EOF >gateway-environment-cert-$environ.yaml
 ---
 # Wildcard Certificate for Gateways specific to logical environment
-apiVersion: cert-manager.io/v1alpha2
+apiVersion: cert-manager.io/v1
 kind: Certificate
 metadata:
   name: $environ.twdps.di-cert
@@ -79,8 +79,8 @@ spec:
     kind: Issuer
   dnsNames:
   - '$api_host'
-  - 'twdps.di'
-  - 'www.twdps.di'
+  - 'twdps.io'
+  - 'www.twdps.io'
 EOF
 }
 
@@ -127,7 +127,7 @@ kubectl apply -f certificate_configuration.yaml
 cat <<EOF >gateway-cert-$cluster.yaml 
 ---
 # Wildcard Certificate for default Gateways
-apiVersion: cert-manager.io/v1alpha2
+apiVersion: cert-manager.io/v1
 kind: Certificate
 metadata:
   name: star.$cluster
@@ -160,10 +160,8 @@ kubectl apply -f gateway-cert-$cluster.yaml
 # certificate per environment
 
 if [[ $environ == 'di-staging' ]]; then
-  echo "Di-STAGING"
   create_prod_cert $environ $api_host
 else
-  echo "DI-DEV"
   create_dev_cert $environ $api_host
 fi 
 
