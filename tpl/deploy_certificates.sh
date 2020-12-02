@@ -126,7 +126,7 @@ spec:
   - '$cluster.twdps.io'
 EOF
 
-kubectl apply -f certificate_configuration.yaml
+# kubectl apply -f certificate_configuration.yaml
 
 ## Gateway certs
 
@@ -153,7 +153,7 @@ spec:
   #     - twdps.io
 EOF
 
-kubectl apply -f gateway-cert-$cluster.yaml
+# kubectl apply -f gateway-cert-$cluster.yaml
 
 
 # And then each cluster will have a number of ENVIRONMENT gateways deployed and certicates. 
@@ -171,6 +171,6 @@ else
   create_dev_cert $environ $api_host
 fi 
 
-kubectl apply -f gateway-environment-cert-$environ.yaml
+# kubectl apply -f gateway-environment-cert-$environ.yaml
 
 sleep 10

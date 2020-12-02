@@ -41,12 +41,12 @@ spec:
     istio: $GATEWAY_SOURCE-ingressgateway
   servers:
   - port:
-      number: 443
+      number: 80
       name: https-$GATEWAY_SOURCE
-      protocol: HTTPS
-    tls:
-      mode: SIMPLE
-      credentialName: star.$cluster-cert
+      protocol: HTTP
+    # tls:
+    #   mode: SIMPLE
+    #   credentialName: star.$cluster-cert
     hosts:
     - '*'
 EOF
@@ -69,12 +69,12 @@ spec:
     istio: $GATEWAY_SOURCE-ingressgateway
   servers:
   - port:
-      number: 443
+      number: 80
       name: https-api-$environ-twdps.di-name
-      protocol: HTTPS
-    tls:
-      mode: SIMPLE
-      credentialName: $environ.twdps.di-cert
+      protocol: HTTP
+    # tls:
+    #   mode: SIMPLE
+    #   credentialName: $environ.twdps.di-cert
     hosts:
       - "$host"
 
