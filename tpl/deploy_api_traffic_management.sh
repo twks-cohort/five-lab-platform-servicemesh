@@ -2,84 +2,46 @@
 
 export cluster=$1
 export environ=$2
-if [[ $cluster == 'preview' ]]; then
-  if [[ $environ == 'di-dev' ]]; then
-    host='dev.twdps.io'
-  elif [[ $environ == 'di-staging' ]]; then
-    host='api.twdps.io'
-  fi
-fi
+#!/usr/bin/env bash
+set -e
 
-if [[ $cluster == 'sandbox' ]]; then
-  if [[ $environ == 'di-dev' ]]; then
-    host="dev.$cluster.twdps.io"
-  elif [[ $environ == 'di-staging' ]]; then
-    host="api.$cluster.twdps.io"
-  fi
-fi
+export API_GATEWAY=$(cat tpl/$cluster.json | jq -r ".api_gateway_subdomains.$environ")
+export HOST=$(cat tpl/$cluster.json | jq -r '.host')
 
-# star cert for default gateways
-
-
-# each cluster will have default gateways for each of the ingressgateways
-# gateway_source = [ internal | external | external-whitelist ]
-
-for GATEWAY_SOURCE in internal external external-whitelist
-do
-cat <<EOF > gateway-default-$GATEWAY_SOURCE.yaml
+cat <<EOF > api-traffic-management.yaml
+---
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: ${HOST}-$environ-certificate
+  namespace: istio-system
+spec:
+  secretName: ${HOST}-$environ-certificate
+  issuerRef:
+    name: ${HOST}-issuer
+    kind: ClusterIssuer
+  commonName: "$API_GATEWAY"
+  dnsNames:
+  - "$API_GATEWAY"
 ---
 apiVersion: networking.istio.io/v1alpha3
 kind: Gateway
 metadata:
-  name: $GATEWAY_SOURCE-gateway
-  namespace: istio-system
-  labels:
-    app: istio-ingressgateway
-    istio: $GATEWAY_SOURCE-ingressgateway
-spec:
-  selector:
-    istio: $GATEWAY_SOURCE-ingressgateway
-  servers:
-  - port:
-      number: 80
-      name: https-$GATEWAY_SOURCE
-      protocol: HTTP
-    # tls:
-    #   mode: SIMPLE
-    #   credentialName: star.$cluster-cert
-    hosts:
-    - '*'
-EOF
-kubectl apply -f gateway-default-$GATEWAY_SOURCE.yaml
-done 
-
-
-
-# 
-for GATEWAY_SOURCE in internal external external-whitelist
-do
-cat <<EOF > gateway-$environ-$GATEWAY_SOURCE.yaml
-apiVersion: networking.istio.io/v1alpha3
-kind: Gateway
-metadata:
-  name: $GATEWAY_SOURCE-$environ-gateway
+  name: api-gateway-$environ
   namespace: istio-system
 spec:
   selector:
-    istio: $GATEWAY_SOURCE-ingressgateway
+    istio: ingressgateway
   servers:
   - port:
       number: 80
-      name: https-api-$environ-twdps.di-name
+      name: http
       protocol: HTTP
-    # tls:
-    #   mode: SIMPLE
-    #   credentialName: $environ.twdps.di-cert
+    tls:
+      httpsRedirect: true
     hosts:
-      - "$host"
-
+    - "$API_GATEWAY"
 EOF
-kubectl apply -f gateway-$environ-$GATEWAY_SOURCE.yaml
-done 
+#kubectl apply -f api-traffic-management.yaml
 
-
+sleep 10

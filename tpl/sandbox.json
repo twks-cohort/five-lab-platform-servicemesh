@@ -4,5 +4,10 @@
   "default_limits_cpu": "250m",
   "default_limits_memory": "256Mi",
   "kiali_version": "1.26.0",
-  "cert_manager_version": "1.0.4"
+  "cert_manager_version": "1.0.4",
+  "host": "sandbox.twdps.io",
+  "api_gateway_subdomains": {
+    "dev": "dev.sandbox.twdps.io",
+    "staging": "api.sandbox.twdps.io"
+  }
 }
