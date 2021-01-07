@@ -9,5 +9,6 @@
   "api_gateway_subdomains": {
     "dev": "dev.sandbox.twdps.io",
     "staging": "api.sandbox.twdps.io"
-  }
+  },
+  "issuerEndpoint": "https://acme-v02.api.letsencrypt.org/directory"
 }
