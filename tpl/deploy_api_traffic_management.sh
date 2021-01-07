@@ -41,7 +41,16 @@ spec:
       httpsRedirect: true
     hosts:
     - "$API_GATEWAY"
+  - port:
+      number: 443
+      name: https
+      protocol: HTTPS
+    tls:
+      mode: SIMPLE
+      credentialName: ${HOST}-$environ-certificate
+    hosts:
+    - "$API_GATEWAY"
 EOF
-#kubectl apply -f api-traffic-management.yaml
+kubectl apply -f api-traffic-management.yaml
 
 sleep 10

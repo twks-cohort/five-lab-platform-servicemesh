@@ -70,10 +70,10 @@ commands:
           command: NAMESPACE="di-dev" bats test/dev_namespaces.bats
       - run:
           name: deploy api traffic management for di-dev
-          command: bash tpl/deploy_api_traffic_management.sh << parameters.cluster >> di-dev
+          command: bash tpl/deploy_api_traffic_management.sh << parameters.cluster >> dev
       - run:
           name: deploy api traffic management for di-staging
-          command: bash tpl/deploy_api_traffic_management.sh << parameters.cluster >> di-staging
+          command: bash tpl/deploy_api_traffic_management.sh << parameters.cluster >> staging
       - run:
           name: test traffic management
           command: CLUSTER=<< parameters.cluster >> bats test/platform_traffic_management.bats
