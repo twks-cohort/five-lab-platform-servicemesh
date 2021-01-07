@@ -9,10 +9,27 @@ export KIALI_VERSION=$(cat tpl/${CLUSTER}.json | jq -r '.kiali_version')
 export DEFAULT_LIMITS_CPU=$(cat tpl/${CLUSTER}.json | jq -r '.default_limits_cpu')
 export DEFAULT_LIMITS_MEMORY=$(cat tpl/${CLUSTER}.json | jq -r '.default_limits_memory')
 
-curl -L https://istio.io/downloadIstio | ISTIO_VERSION=$ISTIO_VERSION sh -
+# curl -L https://istio.io/downloadIstio | ISTIO_VERSION=$ISTIO_VERSION sh -
 
 kubectl apply -f istio-namespace.yaml
-istioctl install -f istio-deploy-overlay.yaml
+istioctl operator init 
+sleep 30
+
+ cat << EOF > istio-manifest.yaml
+apiVersion: install.istio.io/v1alpha1
+kind: IstioOperator
+metadata:
+  namespace: istio-system
+  name: istiocontrolplane
+spec:
+  profile: default
+  tag: $ISTIO_VERSION-distroless
+  meshConfig:
+    accessLogFile: /dev/stdout
+    accessLogEncoding: JSON
+    enableTracing: true
+EOF
+cat istio-manifest.yaml | kubectl apply -f -
 
 # quickstart versions - not tuned for production performance or security
 kubectl apply -f https://raw.githubusercontent.com/istio/istio/release-1.7/samples/addons/jaeger.yaml
