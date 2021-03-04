@@ -36,35 +36,26 @@ commands:
           name: deploy istio with cluster specific values
           command: bash tpl/deploy_istio.sh << parameters.cluster >>
       - run:
-          name: deploy external dns
-          command: bash tpl/deploy_external_dns.sh << parameters.cluster >>
-      - run:
           name: test servicemesh deployment
           command: CLUSTER=<< parameters.cluster >> bats test/platform_servicemesh.bats
+      # - run:
+      #     name: deploy httpbin and validate
+      #     command: bash tpl/deploy_httpbin.sh << parameters.cluster >>
+      # - run:
+      #     name: test httpbin traffic
+      #     command: CLUSTER=<< parameters.cluster >> bats test/platform_httpbin.bats
+      # - run:
+      #     name: deploy default istio gateways
+      #     command: bash tpl/deploy_istio_gateways.sh << parameters.cluster >>
       - run:
-          name: deploy httpbin and validate
-          command: bash tpl/deploy_httpbin.sh << parameters.cluster >>
-      - run:
-          name: test httpbin traffic
-          command: CLUSTER=<< parameters.cluster >> bats test/platform_httpbin.bats
-      - run:
-          name: deploy monitoring traffic management
-          command: bash tpl/deploy_monitoring_traffic_management.sh << parameters.cluster >>
-      - run:
-          name: deploy api traffic management for di-dev
-          command: bash tpl/deploy_api_traffic_management.sh << parameters.cluster >> di-dev
-      - run:
-          name: deploy api traffic management for di-staging
-          command: bash tpl/deploy_api_traffic_management.sh << parameters.cluster >> di-staging
-      - run:
-          name: test traffic management
-          command: CLUSTER=<< parameters.cluster >> bats test/platform_traffic_management.bats
-      - run:
-          name: deploy cert-manager
-          command: bash tpl/deploy_cert_manager.sh << parameters.cluster >>
-      - run:
-          name: deploy certificates
-          command: bash tpl/deploy_certificates.sh << parameters.cluster >>
+          name: deploy a couple default environment gateways
+          command: bash tpl/deploy_environment_gateways.sh << parameters.cluster >>
+      # - run:
+      #     name: test traffic management
+      #     command: CLUSTER=<< parameters.cluster >> bats test/platform_traffic_management.bats
+      # - run:
+      #     name: deploy certificates
+      #     command: bash tpl/deploy_certificates.sh << parameters.cluster >>
 
 
 jobs:

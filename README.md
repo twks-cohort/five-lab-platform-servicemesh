@@ -1,14 +1,11 @@
 # lab-platform-servicemesh
 
-NOTE: not yet tested on twdps aws account
-
-
 Starting point for istio servicemesh.
 
-- Deploys Istio using istioctl deploy with manifest overlay
+- Deploys Istio using istio operator with a manifest overlay
 - - distroless images
-- - meshConfig.accessLogFile: "/dev/stdout"
-- - meshConfig.accessLogEncoding: "JSON" 
+- - json logging by default
+- - tracing enabled
 - - ingressgateway enabled
 - - prometheus, grafana, jaeger, kiali have quickstart installs, not production ready, only proxy access
 
@@ -29,7 +26,6 @@ $ istioctl dashboard kiali
 
 add:  
 
-- external-dns  
 - cert-manager (implementing acme for twdps.io)  
 - standard env gateways (typically would support the Enterprise's default environments, later an operator is deployed to respond to customer self-management of add'l env)  
 

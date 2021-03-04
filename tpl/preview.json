@@ -1,8 +1,8 @@
 {
   "cluster_name": "preview",
-  "istio_version": "1.7.4",
+  "domain": "twdps.io",
+  "istio_version": "1.9.0",
+  "istio_upgrade": "1.9.0",
   "default_limits_cpu": "2000m",
-  "default_limits_memory": "1024Mi",
-  "kiali_version": "1.26.0",
-  "cert_manager_version": "1.0.3"
+  "default_limits_memory": "1024Mi"
 }

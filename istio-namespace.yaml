@@ -1,5 +1,11 @@
-# create amazon-cloudwatch namespace
+---
 apiVersion: v1
 kind: Namespace
 metadata:
   name: istio-system
+
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: kiali-operator

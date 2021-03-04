@@ -1,0 +1,12 @@
+kubeconfig_sandbox
+kubeconfig
+local.env
+.notes
+sandbox_config
+test_config
+.venv
+.terraform/
+terrform.*
+*.auto.tfvars.json
+.terraform.lock.hcl
+Pipfile.lock
