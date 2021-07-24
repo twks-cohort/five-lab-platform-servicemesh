@@ -1,0 +1,23 @@
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: demo-dev
+  labels:
+    istio-injection: enabled
+
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: demo-qa
+  labels:
+    istio-injection: enabled
+
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: demo-prod
+  labels:
+    istio-injection: enabled

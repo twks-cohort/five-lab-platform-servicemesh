@@ -1,5 +1,5 @@
-kubeconfig_sandbox
-kubeconfig
+
+kubeconfig*
 local.env
 .notes
 sandbox_config
@@ -7,6 +7,7 @@ test_config
 .venv
 .terraform/
 terrform.*
-*.auto.tfvars.json
 .terraform.lock.hcl
 Pipfile.lock
+credentials
+istio-1*

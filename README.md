@@ -1,4 +1,12 @@
-# lab-platform-servicemesh
+<div align="center">
+	<p>
+		<img alt="Thoughtworks Logo" src="https://raw.githubusercontent.com/ThoughtWorks-DPS/static/master/thoughtworks_flamingo_wave.png?sanitize=true" width=200 />
+    <br />
+		<img alt="DPS Title" src="https://raw.githubusercontent.com/ThoughtWorks-DPS/static/master/dps_lab_title.png?sanitize=true" width=350/>
+	</p>
+  <h3>lab-platform-servicemesh</h3>
+</div>
+<br />
 
 Starting point for istio servicemesh.
 
@@ -21,8 +29,44 @@ $ istioctl dashboard jaeger
 $ istioctl dashboard kiali
 ```
 
+## Default namespaces and gateways
 
-# TODO
+A common pattern for managing internal-customer tenanted namespaces and gateways is by default environment names.  
+
+For example, company X provides access to apis via the api.example.com domain, and the default environments in the companies release pipelines are:  
+
+_nonprod cluster_  
+dev  
+qa  
+staging  
+
+_prod cluster_  
+prod  
+
+Company X has three teams working:  
+blue  
+red  
+green  
+
+| cluster  | blue team    | red team    | green team    | gateway         |
+|----------|--------------|-------------|---------------|-----------------|
+| non-prod | blue-dev     | red-dev     | green-dev     | dev-gateway     |
+| non-prod | blue-qa      | red-qa      | green-qa      | qa-gateway      |
+| non-prod | blue-staging | red-staging | green-staging | staging-gateway |
+| prod     | blue-prod    | red-prod    | green-prod    | prod-gateway    |
+
+
+| gateway         | url                                   |
+|-----------------|---------------------------------------|
+| dev-gateway     | dev.api.example.com/team-api-name     |
+| qa-gateway      | qa.api.example.com/team-api-name      |
+| staging-gateway | staging.api.example.com/team-api-name |
+| prod-gateway    | api.example.com/team-api-name         |
+
+
+
+
+
 
 add:  
 

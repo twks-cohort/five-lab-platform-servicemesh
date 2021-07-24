@@ -1,0 +1,97 @@
+---
+apiVersion: networking.istio.io/v1beta1
+kind: Gateway
+metadata:
+  name: dev-gateway
+  namespace: istio-system
+  labels:
+    istio: istio-ingressgateway
+spec:
+  selector:
+    app: istio-ingressgateway
+  servers:
+  - port:
+      number: 80
+      name: http-dev
+      protocol: HTTP
+    hosts:
+    - "dev.twdps.io"
+    - "*.dev.twdps.io"
+    - "dev.api.twdps.io"
+    tls:
+      httpsRedirect: true # sends 301 redirect for http requests
+  - port:
+      number: 443
+      name: https-dev
+      protocol: HTTPS
+    hosts:
+    - "dev.twdps.io"
+    - "*.dev.twdps.io"
+    - "dev.api.twdps.io"
+    tls:
+      mode: SIMPLE 
+      credentialName: dev.twdps.io-certificate
+
+---
+apiVersion: networking.istio.io/v1beta1
+kind: Gateway
+metadata:
+  name: qa-gateway
+  namespace: istio-system
+  labels:
+    istio: istio-ingressgateway
+spec:
+  selector:
+    app: istio-ingressgateway
+  servers:
+  - port:
+      number: 80
+      name: http-qa
+      protocol: HTTP
+    hosts:
+    - "qa.twdps.io"
+    - "*.qa.twdps.io"
+    - "qa.api.twdps.io"
+    tls:
+      httpsRedirect: true # sends 301 redirect for http requests
+  - port:
+      number: 443
+      name: https-qa
+      protocol: HTTPS
+    hosts:
+    - "qa.twdps.io"
+    - "*.qa.twdps.io"
+    - "qa.api.twdps.io"
+    tls:
+      mode: SIMPLE 
+      credentialName: qa.twdps.io-certificate
+
+---
+apiVersion: networking.istio.io/v1beta1
+kind: Gateway
+metadata:
+  name: prod-gateway
+  namespace: istio-system
+  labels:
+    istio: istio-ingressgateway
+spec:
+  selector:
+    app: istio-ingressgateway
+  servers:
+  - port:
+      number: 80
+      name: http-prod
+      protocol: HTTP
+    hosts:
+    - "api.twdps.io"
+    tls:
+      httpsRedirect: true # sends 301 redirect for http requests
+  - port:
+      number: 443
+      name: https-qa
+      protocol: HTTPS
+    hosts:
+    - "api.twdps.io"
+    tls:
+      mode: SIMPLE 
+      credentialName: api.twdps.io-certificate
