@@ -112,26 +112,7 @@ commands:
       # - run:
       #     name: deploy certificates
       #     command: bash tpl/deploy_certificates.sh << parameters.cluster >>
-deploy-default-environments:
-  parameters:
-    cluster:
-      description: target kubernetes cluster
-      type: string
-      default: ""
-  steps:
-    - run:
-        name: deploy default namespaces
-        command: kubectl apply -f tpl/default-<< parameters.cluster >>-namespaces.yaml
-    - run:
-        name: deploy default certificates
-        command:
-    - run:
-        name: deploy default gateways
-        command: |
-          bash scripts/deploy_default_gateways.sh << parameters.cluster >>
-          kubectl apply -f tpl/preview-gateways.yaml
-
-deploy-istio-integrations:
+  deploy-default-environments:
     parameters:
       cluster:
         description: target kubernetes cluster
@@ -139,20 +120,39 @@ deploy-istio-integrations:
         default: ""
     steps:
       - run:
-          name: deploy quickstart prometheus matching istio version
-          command: bash scripts/deploy_prometheus.sh << parameters.cluster >>
+          name: deploy default namespaces
+          command: kubectl apply -f tpl/default-<< parameters.cluster >>-namespaces.yaml
       - run:
-          name: deploy quickstart grafana matching istio version
-          command: bash scripts/deploy_grafana.sh << parameters.cluster >>
+          name: deploy default certificates
+          command: bash scripts/deploy_default_certificates.sh << parameters.cluster >>
       - run:
-          name: deploy quickstart jaeger matching istio version
-          command: bash scripts/deploy_jaeger.sh << parameters.cluster >>
-      - run:
-          name: deploy current release version of kiali
-          command: bash scripts/deploy_kiali.sh << parameters.cluster >>
-      - run:
-          name: validate istio deployment
-          command: CLUSTER=<< parameters.cluster >> bats test/validate_istio_integrations.bats
+          name: deploy default gateways
+          command: |
+            bash scripts/deploy_default_gateways.sh << parameters.cluster >>
+            kubectl apply -f tpl/preview-gateways.yaml
+
+  deploy-istio-integrations:
+      parameters:
+        cluster:
+          description: target kubernetes cluster
+          type: string
+          default: ""
+      steps:
+        - run:
+            name: deploy quickstart prometheus matching istio version
+            command: bash scripts/deploy_prometheus.sh << parameters.cluster >>
+        - run:
+            name: deploy quickstart grafana matching istio version
+            command: bash scripts/deploy_grafana.sh << parameters.cluster >>
+        - run:
+            name: deploy quickstart jaeger matching istio version
+            command: bash scripts/deploy_jaeger.sh << parameters.cluster >>
+        - run:
+            name: deploy current release version of kiali
+            command: bash scripts/deploy_kiali.sh << parameters.cluster >>
+        - run:
+            name: validate istio deployment
+            command: CLUSTER=<< parameters.cluster >> bats test/validate_istio_integrations.bats
 
 jobs:
   deploy-servicemesh:
@@ -174,6 +174,7 @@ jobs:
       - deploy-cert-manager:
           cluster: << parameters.cluster >>
       - deploy-default-environments:
+          cluster: << parameters.cluster >>
       - deploy-istio-integrations:
           cluster: << parameters.cluster >>
 
