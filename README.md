@@ -8,74 +8,38 @@
 </div>
 <br />
 
-Starting point for istio servicemesh.
+The Lab servicemesh demonstrates the following configuration.  
 
-- Deploys Istio using istio operator with a manifest overlay
-- - distroless images
-- - json logging by default
-- - tracing enabled
-- - ingressgateway enabled
-- - prometheus, grafana, jaeger, kiali have quickstart installs, not production ready, only proxy access
+- Deploys Istio using istio operator with a manifest overlay  
+- - distroless images  
+- - json logging by default  
+- - tracing enabled  
+- - ingressgateway enabled  
+- Deploys external-dns for route53 automation  
+- Deploys cert-manager with letsencrypt integration for automated ingress certificates  
 
+**Domains**  
 
-## to access UIs
+top level domain managed in same account: twdps.digital  
+top level domain managed in different account: twdps.io   
+
+## Default cluster gateways and namespaces
+
+By default, cluster specific gateways and certificates exist for ingress by services and applications that are cluster-wide in nature (including test fixtures).   
+
+CLUSTER-NAME.domain  
+*.CLUSTER-NAME.domain  
+
+A `default-mtls` namespace is deployed to each cluster for validate and testing of istio configurations.  
+
+## to access istio UIs
 
 ```
 $ istioctl dashboard controlz <pod-name[.namespace]>
 $ istioctl dashboard envoy <pod-name[.namespace]>
-$ istioctl dashboard prometheus
-$ istioctl dashboard grafana
-$ istioctl dashboard jaeger
-$ istioctl dashboard kiali
 ```
+## upgrades
 
-## Default namespaces and gateways
+Change the istio, external-dns, and cert-manager versions in the cluster.json.tpl and run the pipeline. Note: this will perform an in-place upgrade rather than a rolling update - expect some service interruption.  
 
-A common pattern for managing internal-customer tenanted namespaces and gateways is by default environment names.  
-
-For example, company X provides access to apis via the api.example.com domain, and the default environments in the companies release pipelines are:  
-
-_nonprod cluster_  
-dev  
-qa  
-staging  
-
-_prod cluster_  
-prod  
-
-Company X has three teams working:  
-blue  
-red  
-green  
-
-| cluster  | blue team    | red team    | green team    | gateway         |
-|----------|--------------|-------------|---------------|-----------------|
-| non-prod | blue-dev     | red-dev     | green-dev     | dev-gateway     |
-| non-prod | blue-qa      | red-qa      | green-qa      | qa-gateway      |
-| non-prod | blue-staging | red-staging | green-staging | staging-gateway |
-| prod     | blue-prod    | red-prod    | green-prod    | prod-gateway    |
-
-
-| gateway         | url                                   |
-|-----------------|---------------------------------------|
-| dev-gateway     | dev.api.example.com/team-api-name     |
-| qa-gateway      | qa.api.example.com/team-api-name      |
-| staging-gateway | staging.api.example.com/team-api-name |
-| prod-gateway    | api.example.com/team-api-name         |
-
-
-
-
-
-
-add:  
-
-- cert-manager (implementing acme for twdps.io)  
-- standard env gateways (typically would support the Enterprise's default environments, later an operator is deployed to respond to customer self-management of add'l env)  
-
-
-
-Adjust:
-
-- currently the role assumed by the external-dns deploy is being created in the -eks pipeline, need to bring that into this repo and switch from tf to sdk configuration (since nothing else in this pipeline is tf)
-
+### TODO:  

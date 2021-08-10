@@ -14,8 +14,3 @@
   run bash -c "kubectl get pods -n cert-manager -o wide | grep 'cert-manager-webhook'"
   [[ "${output}" =~ "Running" ]]
 }
-
-@test "evaluate certificate issuer status" {
-  run bash -c "kubectl get clusterissuers -n cert-manager | grep 'letsencrypt-${CLUSTER}-issuer'"
-  [[ "${output}" =~ "True" ]]
-}

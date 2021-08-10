@@ -29,130 +29,68 @@ commands:
       cluster:
         description: target kubernetes cluster
         type: string
-        default: ""
+        default: $CLUSTER
     steps:
       - run:
-          name: set environment tfvars and cert-manager files
-          command: |
-            secrethub inject -i environments/<< parameters.cluster >>.auto.tfvars.json.tpl -o << parameters.cluster >>.auto.tfvars.json
-            secrethub inject -i environments/<< parameters.cluster >>.cert-manager.json.tpl -o << parameters.cluster >>.cert-manager.json
+          name: write << parameters.cluster >>.auto.tfvars.json from template
+          command: secrethub inject -i environments/<< parameters.cluster >>.auto.tfvars.json.tpl -o << parameters.cluster >>.auto.tfvars.json
+      - run:
+          name: write << parameters.cluster >>.json from template
+          command: secrethub inject -i environments/<< parameters.cluster >>.json.tpl -o << parameters.cluster >>.json
       - run:
           name: pull kubeconfig
           command: |
-            mkdir ~/.kube
+            mkdir -p ~/.kube
             SECRETHUB_VAR_ENV=<< parameters.cluster >> secrethub inject -i tpl/kubeconfig.tpl -o ~/.kube/config
 
-  deploy-istio:
+  deploy-servicemesh:
     parameters:
       cluster:
         description: target kubernetes cluster
         type: string
-        default: ""
+        default: $CLUSTER
     steps:
       - run: 
-          name: install the istioctl version matching the version in cluster.json
+          name: install the istioctl version matching the version in << parameters.cluster >>.json
           command: bash scripts/install_istioctl_by_version.sh << parameters.cluster >>
       - run:
           name: deploy istio operator and matching version manifest
           command: bash scripts/deploy_istio.sh << parameters.cluster >>
       - run:
-          name: validate istio deployment
-          command: CLUSTER=<< parameters.cluster >> bats test/validate_istio.bats
-
-  deploy-external-dns:
-    parameters:
-      cluster:
-        description: target kubernetes cluster
-        type: string
-        default: ""
-    steps:
-      - run:
           name: deploy external-dns
           command: bash scripts/deploy_external_dns.sh << parameters.cluster >>
       - run:
-          name: validate external-dns deployment
-          command: CLUSTER=<< parameters.cluster >> bats test/validate_external_dns.bats
-
-  deploy-cert-manager:
-    parameters:
-      cluster:
-        description: target kubernetes cluster
-        type: string
-        default: ""
-    steps:
-      - run:
           name: deploy cert-manager
-          command: bash scripts/deploy_cert-manager.sh << parameters.cluster >>
+          command: bash scripts/deploy_cert_manager.sh << parameters.cluster >>
       - run:
           name: deploy cluster certificate issuer
           command: bash scriprts/deploy_cert_issuer.sh << parameters.cluster >>
       - run:
-          name: validate cert-manager deployment
-          command: CLUSTER=<< parameters.cluster >> bats test/validate_cert_manager.bats
-
-
+          name: deploy default cluster environment gateways and certificates
+          command: bash scripts/deploy_default_gateways.sh << parameters.cluster >>
       - run:
-          name: deploy default namespace and environment gateways
-          command: |
-            kubectl apply -f default-<< parameters.cluster >>-namespaces.yaml
-            kubectl apply -f default-<< parameters.cluster >>-gateways
-      # - run:
-      #     name: deploy httpbin and validate
-      #     command: bash tpl/deploy_httpbin.sh << parameters.cluster >>
-      # - run:
-      #     name: test httpbin traffic
-      #     command: CLUSTER=<< parameters.cluster >> bats test/platform_httpbin.bats
-      # - run:
-      #     name: deploy default istio gateways
-      #     command: bash tpl/deploy_istio_gateways.sh << parameters.cluster >>
+          name: deploy default cluster mtls namespace
+          command: kubectl apply -f tpl/default-mtls-namespace.yaml
 
-      # - run:
-      #     name: test traffic management
-      #     command: CLUSTER=<< parameters.cluster >> bats test/platform_traffic_management.bats
-      # - run:
-      #     name: deploy certificates
-      #     command: bash tpl/deploy_certificates.sh << parameters.cluster >>
-deploy-default-environments:
-  parameters:
-    cluster:
-      description: target kubernetes cluster
-      type: string
-      default: ""
-  steps:
-    - run:
-        name: deploy default namespaces
-        command: kubectl apply -f tpl/default-<< parameters.cluster >>-namespaces.yaml
-    - run:
-        name: deploy default certificates
-        command:
-    - run:
-        name: deploy default gateways
-        command: |
-          bash scripts/deploy_default_gateways.sh << parameters.cluster >>
-          kubectl apply -f tpl/preview-gateways.yaml
-
-deploy-istio-integrations:
+  validate-servicemesh:
     parameters:
       cluster:
         description: target kubernetes cluster
         type: string
-        default: ""
+        default: $CLUSTER
     steps:
       - run:
-          name: deploy quickstart prometheus matching istio version
-          command: bash scripts/deploy_prometheus.sh << parameters.cluster >>
-      - run:
-          name: deploy quickstart grafana matching istio version
-          command: bash scripts/deploy_grafana.sh << parameters.cluster >>
-      - run:
-          name: deploy quickstart jaeger matching istio version
-          command: bash scripts/deploy_jaeger.sh << parameters.cluster >>
-      - run:
-          name: deploy current release version of kiali
-          command: bash scripts/deploy_kiali.sh << parameters.cluster >>
-      - run:
           name: validate istio deployment
-          command: CLUSTER=<< parameters.cluster >> bats test/validate_istio_integrations.bats
+          command: CLUSTER=<< parameters.cluster >> bats test/validate_istio.bats
+      - run:
+          name: validate external-dns deployment
+          command: CLUSTER=<< parameters.cluster >> bats test/validate_external_dns.bats
+      - run:
+          name: validate cert-manager deployment
+          command: CLUSTER=<< parameters.cluster >> bats test/validate_cert_manager.bats
+      - run:
+          name: validate default ingress and certificates
+          command: bash scripts/validate_ingress.sh
 
 jobs:
   deploy-servicemesh:
@@ -165,17 +103,12 @@ jobs:
     steps:
       - checkout
       - setup_remote_docker
+      - run:
+          name: set CLUSTER environment var
+          command: echo "export CLUSTER=<< parameters.cluster >>" >> $BASH_ENV
       - set-environment:
-          cluster: << parameters.cluster >>
-      - deploy-istio:
-          cluster: << parameters.cluster >>
-      - deploy-external-dns:
-          cluster: << parameters.cluster >>
-      - deploy-cert-manager:
-          cluster: << parameters.cluster >>
-      - deploy-default-environments:
-      - deploy-istio-integrations:
-          cluster: << parameters.cluster >>
+      - deploy-servicemesh:
+      - validate-servicemesh:
 
 workflows:
   version: 2

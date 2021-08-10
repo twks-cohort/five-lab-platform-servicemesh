@@ -1,0 +1,38 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: bash
+  namespace: cert-manager
+  labels:
+    app.kubernetes.io/name: bash
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: bash
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: bash
+    spec:
+      containers:
+      - image: ubuntu:latest
+        command: ["sh", "-c", "tail -f /dev/null"]
+        name: kube-state-metrics
+      serviceAccountName: cert-manager
+
+
+# apt-get install python3 curl unzip
+# apt install python3.8-venv
+# ln -f -s /usr/bin/pip3 /usr/bin/pip
+# ln -f -s /usr/bin/pydoc3 /usr/bin/pydoc
+# ln -f -s /usr/bin/python3 /usr/bin/python
+# ln -f -s /usr/bin/python3-config /usr/bin/python-config
+# python -V
+# curl "https://s3.amazonaws.com/aws-cli/awscli-bundle.zip" -o "awscli-bundle.zip"
+# unzip awscli-bundle.zip
+# ./awscli-bundle/install -b ~/bin/aws
+
+# aws-vault exec dps.nic.cheneweth -- kubectl exec bash-6cfbb6bb76-f79qj -n cert-manager --stdin --tty -- /bin/bash
+# /root/bin/aws route53 list-hosted-zones
+#

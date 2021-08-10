@@ -1,6 +1,6 @@
 locals {
   cert_manager_account_namespace = "cert-manager"
-  cert_manager_service_account_name = "${var.cluster_name}-cert-manager"
+  cert_manager_service_account_name = "cert-manager"
 }
 
 # Cert-Manager
