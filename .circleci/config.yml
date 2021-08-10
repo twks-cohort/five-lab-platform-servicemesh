@@ -10,9 +10,9 @@ executors:
       - image: twdps/di-circleci-infra-image:stable
     shell: secrethub run -- /bin/sh -eo pipefail
       
-on-push-master: &on-push-master
+on-push-main: &on-push-main
   branches:
-    only: /master/
+    only: /main/
   tags:
     ignore: /.*/
 
@@ -188,7 +188,7 @@ workflows:
           context: twdps-di
           shell: secrethub run --env-file secrethub.nonprod.env -- /bin/sh -eo pipefail
           workspace: sandbox
-          filters: *on-push-master
+          filters: *on-push-main
 
       - deploy-servicemesh:
           name: deploy-sandbox-servicemesh
@@ -196,4 +196,4 @@ workflows:
           cluster: sandbox
           requires:
             - apply-sandbox-roles
-          filters: *on-push-master
+          filters: *on-push-main
