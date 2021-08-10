@@ -107,12 +107,12 @@ jobs:
     steps:
       - checkout
       - setup_remote_docker
-      - run:
-          name: set CLUSTER environment var
-          command: echo "export CLUSTER=<< parameters.cluster >>" >> $BASH_ENV
-      - set-environment
-      - deploy-servicemesh-components
-      - validate-servicemesh
+      - set-environment:
+          cluster: << parameters.cluster >>
+      - deploy-servicemesh-components:
+          cluster: << parameters.cluster >>
+      - validate-servicemesh:
+          cluster: << parameters.cluster >>
 
 workflows:
   version: 2
