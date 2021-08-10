@@ -49,4 +49,4 @@ spec:
           hostedZoneID: ${CROSS_ACCOUNT_HOSTED_ZONE_ID}
 EOF
 
-kubectl apply -f same_account_domain_certificate_issuer.yaml
+kubectl apply -f ${CLUSTER}-cluster-issuer.yaml
