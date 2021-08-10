@@ -107,9 +107,9 @@ jobs:
       - run:
           name: set CLUSTER environment var
           command: echo "export CLUSTER=<< parameters.cluster >>" >> $BASH_ENV
-      - set-environment:
-      - deploy-servicemesh-components:
-      - validate-servicemesh:
+      - set-environment
+      - deploy-servicemesh-components
+      - validate-servicemesh
 
 workflows:
   version: 2
