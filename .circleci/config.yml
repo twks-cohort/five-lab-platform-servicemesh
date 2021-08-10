@@ -124,6 +124,9 @@ workflows:
           context: twdps-di
           shell: secrethub run --env-file secrethub.nonprod.env -- /bin/sh -eo pipefail
           workspace: sandbox
+          before-terraform:
+            - set-environment:
+                cluster: sandbox
           filters: *on-push-main
 
       - deploy-servicemesh:
