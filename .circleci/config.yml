@@ -38,6 +38,9 @@ commands:
           name: write << parameters.cluster >>.json from template
           command: secrethub inject -i environments/<< parameters.cluster >>.json.tpl -o << parameters.cluster >>.json
       - run:
+          name: set ~/.terraformrc
+          command: secrethub inject -i tpl/terraformrc.tpl -o ~/.terraformrc
+      - run:
           name: pull kubeconfig
           command: |
             mkdir -p ~/.kube
