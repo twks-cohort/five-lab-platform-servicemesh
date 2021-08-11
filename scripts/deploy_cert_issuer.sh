@@ -20,6 +20,7 @@ aws configure set aws_session_token $(cat credentials | jq -r ".Credentials.Sess
 
 export SAME_ACCOUNT_HOSTED_ZONE_ID=$(aws route53 list-hosted-zones-by-name --profile $SAME_ACCOUNT_DOMAIN | jq --arg name "$CLUSTER.$SAME_ACCOUNT_DOMAIN." -r '.HostedZones | .[] | select(.Name=="\($name)") | .Id')
 export CROSS_ACCOUNT_HOSTED_ZONE_ID=$(aws route53 list-hosted-zones-by-name --profile $SAME_ACCOUNT_DOMAIN | jq --arg name "$CLUSTER.$CROSS_ACCOUNT_DOMAIN." -r '.HostedZones | .[] | select(.Name=="\($name)") | .Id')
+export SAME_ACCOUNT_TOP_LEVEL_ZONE_ID=$(aws route53 list-hosted-zones-by-name --profile $SAME_ACCOUNT_DOMAIN | jq --arg name "$SAME_ACCOUNT_DOMAIN." -r '.HostedZones | .[] | select(.Name=="\($name)") | .Id')
 
 cat <<EOF > ${CLUSTER}-cluster-issuer.yaml
 apiVersion: cert-manager.io/v1
@@ -33,6 +34,13 @@ spec:
     privateKeySecretRef:
       name: letsencrypt-sandbox
     solvers:
+    - selector:
+        dnsZones:
+          - "$SAME_ACCOUNT_DOMAIN"
+      dns01:
+        route53:
+          region: ${AWS_DEFAULT_REGION}
+          hostedZoneID: ${SAME_ACCOUNT_TOP_LEVEL_ZONE_ID}
     - selector:
         dnsZones:
           - "$CLUSTER.$SAME_ACCOUNT_DOMAIN"

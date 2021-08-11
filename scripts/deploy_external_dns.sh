@@ -78,6 +78,7 @@ spec:
         - --source=ingress
         - --source=istio-gateway
         - --source=istio-virtualservice
+        - --domain-filter=${SAME_ACCOUNT_DOMAIN}
         - --domain-filter=${CLUSTER}.${SAME_ACCOUNT_DOMAIN}
         - --domain-filter=${CLUSTER}.${CROSS_ACCOUNT_DOMAIN}
         - --provider=aws
