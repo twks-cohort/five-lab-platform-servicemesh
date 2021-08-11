@@ -16,11 +16,11 @@ on-push-main: &on-push-main
   tags:
     ignore: /.*/
 
-# on-tag-master: &on-tag-master
-#   branches:
-#     ignore: /.*/
-#   tags:
-#     only: /.*/
+on-tag-main: &on-tag-main
+  branches:
+    ignore: /.*/
+  tags:
+    only: /.*/
 
 commands:
 
@@ -117,7 +117,7 @@ jobs:
 workflows:
   version: 2
 
-  poc-platform-servicemesh-pipeline:
+  lab-platform-servicemesh-pipeline:
     jobs:
       - terraform/apply:
           name: apply-sandbox-roles
@@ -136,3 +136,22 @@ workflows:
           requires:
             - apply-sandbox-roles
           filters: *on-push-main
+      
+      # release to preview
+      - terraform/apply:
+          name: apply-preview-roles
+          context: twdps-di
+          shell: secrethub run --env-file secrethub.nonprod.env -- /bin/sh -eo pipefail
+          workspace: preview
+          before-terraform:
+            - set-environment:
+                cluster: preview
+          filters: *on-tag-main
+
+      - deploy-servicemesh:
+          name: deploy-preview-servicemesh
+          context: twdps-di
+          cluster: preview
+          requires:
+            - apply-preview-roles
+          filters: *on-tag-main
