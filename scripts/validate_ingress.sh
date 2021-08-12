@@ -11,7 +11,7 @@ bash scripts/deploy_httpbin.sh ${CLUSTER} ${SAME_ACCOUNT_DOMAIN}
 # this is a complete hack - need to sort out params to bats tests
 if [[ $CLUSTER == "sandbox" ]]; then
   bats test/validate_sandbox_twdps_digital.bats
-elseif [[ $CLUSTER == "preview" ]]; then
+elif [[ $CLUSTER == "preview" ]]; then
   bats test/validate_preview_twdps_digital.bats
 fi
 
@@ -21,7 +21,7 @@ bash scripts/deploy_httpbin.sh ${CLUSTER} ${CROSS_ACCOUNT_DOMAIN}
 # this is a complete hack - need to sort out params to bats tests
 if [[ $CLUSTER == "sandbox" ]]; then
   bats test/validate_sandbox_twdps_io.bats
-elseif [[ $CLUSTER == "preview" ]]; then
+elif [[ $CLUSTER == "preview" ]]; then
   bats test/validate_preview_twdps_io.bats
 fi
 
