@@ -11,3 +11,5 @@ terrform.*
 Pipfile.lock
 credentials
 istio-1*
+sandbox.auto.tfvars.json
+sandbox.json

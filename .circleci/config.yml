@@ -75,6 +75,26 @@ commands:
           name: deploy default cluster mtls namespace
           command: kubectl apply -f tpl/default-mtls-namespace.yaml
 
+  deploy-mesh-tools:
+    parameters:
+      cluster:
+        description: target kubernetes cluster
+        type: string
+        default: $CLUSTER
+    steps:
+      - run:
+          name: deploy istio-prometheus
+          command: bash scripts/deploy_prometheus.sh << parameters.cluster >>
+      - run:
+          name: deploy istio-grafana
+          command: bash scripts/deploy_grafana.sh << parameters.cluster >>
+      - run:
+          name: deploy all-in-one jaeger
+          command: bash scripts/deploy_jaeger.sh << parameters.cluster >>
+      - run:
+          name: deploy kiali
+          command: bash scripts/deploy_kiali.sh << parameters.cluster >>
+
   validate-servicemesh:
     parameters:
       cluster:
@@ -94,7 +114,10 @@ commands:
       - run:
           name: validate default ingress and certificates
           command: bash scripts/validate_ingress.sh << parameters.cluster >>
-
+      - run:
+          name: validate mesh tools
+          command: CLUSTER=<< parameters.cluster >> bats test/validate_mesh_tools.bats
+  
 jobs:
   deploy-servicemesh:
     executor: infra-image
@@ -111,8 +134,11 @@ jobs:
           cluster: << parameters.cluster >>
       - deploy-servicemesh-components:
           cluster: << parameters.cluster >>
+      - deploy-mesh-tools:
+          cluster: << parameters.cluster >>
       - validate-servicemesh:
           cluster: << parameters.cluster >>
+      
 
 workflows:
   version: 2
