@@ -93,7 +93,7 @@ commands:
           command: CLUSTER=<< parameters.cluster >> bats test/validate_cert_manager.bats
       - run:
           name: validate default ingress and certificates
-          command: bash scripts/validate_ingress.sh sandbox
+          command: bash scripts/validate_ingress.sh << parameters.cluster >>
 
 jobs:
   deploy-servicemesh:
