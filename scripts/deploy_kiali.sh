@@ -10,9 +10,9 @@ export ISTIO_VERSION=$(cat $CLUSTER.json | jq -r .istio_version)
 # This option is good for demo and development installations. This option grants special
 # cluster role permissions and is not recommended for production.
 
-kubectl create namespace kiali-operator
+kubectl apply -f tpl/kiali-namespace.yaml
 helm install --set cr.create=true --set cr.namespace=istio-system --namespace kiali-operator --repo https://kiali.org/helm-charts kiali-operator kiali-operator
 sleep 40
 
 kubectl get secrets -o json -n istio-system | jq -r '.items[] | select(.metadata.name | test("kiali-service-account")).data.token' > kiali-token
-cat kiali-token | base64 --decode | secrethub write twdps/di/platform/env/$CLUSTER/cluster/kiali-token
+cat kiali-token | base64 -d | secrethub write twdps/di/platform/env/$CLUSTER/cluster/kiali-token
