@@ -12,3 +12,5 @@ bats test/validate_twdps_digital.bats
 # deploy and test httpbin on cross account domain
 bash scripts/deploy_httpbin.sh ${CLUSTER} ${CROSS_ACCOUNT_DOMAIN}
 bats test/validate_twdps_io.bats
+
+kubectl delete -f httpbin.$CLUSTER.$CROSS_ACCOUNT_DOMAIN.yaml
