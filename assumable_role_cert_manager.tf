@@ -1,18 +1,13 @@
-locals {
-  cert_manager_account_namespace = "cert-manager"
-  cert_manager_service_account_name = "cert-manager"
-}
-
 # Cert-Manager
 module "iam_assumable_role_cert_manager" {
   source                        = "terraform-aws-modules/iam/aws//modules/iam-assumable-role-with-oidc"
-  version                       = "4.1.0"
+  version                       = "~>4.7"
 
   create_role                   = true
   role_name                     = "${var.cluster_name}-cert-manager"
-  provider_url                  = replace(data.terraform_remote_state.eks.outputs.eks_cluster_oidc_issuer_url, "https://", "")
+  provider_url                  = data.aws_eks_cluster.cluster.identity[0].oidc[0].issuer
   role_policy_arns              = [aws_iam_policy.cert_manager.arn]
-  oidc_fully_qualified_subjects = ["system:serviceaccount:${local.cert_manager_account_namespace}:${local.cert_manager_service_account_name}"]
+  oidc_fully_qualified_subjects = ["system:serviceaccount:cert-manager:cert-manager"]
   number_of_role_policy_arns    = 1
 }
 
@@ -24,7 +19,6 @@ resource "aws_iam_policy" "cert_manager" {
 
 data "aws_iam_policy_document" "cert_manager" {
   statement {
-    sid    = "${var.cluster_name}CertManagerChanges"
     effect = "Allow"
 
     actions = [
@@ -35,7 +29,6 @@ data "aws_iam_policy_document" "cert_manager" {
   }
 
   statement {
-    sid    = "${var.cluster_name}CertManagerResourceRecordChanges"
     effect = "Allow"
 
     actions = [
@@ -47,7 +40,6 @@ data "aws_iam_policy_document" "cert_manager" {
   }
 
   statement {
-    sid    = "${var.cluster_name}CertManagerListHostedZones"
     effect = "Allow"
 
     actions = [

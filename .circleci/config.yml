@@ -2,13 +2,47 @@
 version: 2.1
 
 orbs:
-  terraform: feedyard/terraform@0.6.0
+  terraform: twdps/terraform@0.4.0
+  # can override kubectl, awspec versions as necessary
+  kube: twdps/kube-ops@0.2.0
+  # used for github-release-notes feature
+  executor-tools: twdps/executor-tools@0.2.0
 
-executors:
-  infra-image:
-    docker:
-      - image: twdps/di-circleci-infra-image:stable
-    shell: secrethub run -- /bin/sh -eo pipefail
+# ==== global pipeline parameters
+
+parameters:
+  context:
+    description: circleci context for all jobs
+    type: string
+    default: twdps-core-labs-team
+  shell-options:
+    description: shell options for all jobs
+    type: string
+    default: secrethub run --env-file secrethub.nonprod.env -- /bin/bash -eo pipefail
+  terraform-version:
+    description: terraform version for all jobs
+    type: string
+    default: "1.1.5"
+  datadog-version:
+    description: datadog cli version for all jobs
+    type: string
+    default: "0.43.0"
+  istioctl-version:
+    description: istioctl cli version for all jobs
+    type: string
+    default: "1.13.0"
+  executor-image:
+    description: image to use for local jobs
+    type: string
+    default: twdps/circleci-kube-ops:alpine-0.5.0
+
+
+
+# executors:
+#   infra-image:
+#     docker:
+#       - image: twdps/di-circleci-infra-image:stable
+#     shell: secrethub run -- /bin/sh -eo pipefail
       
 on-push-main: &on-push-main
   branches:
@@ -53,27 +87,29 @@ commands:
         type: string
         default: $CLUSTER
     steps:
-      - run: 
-          name: install the istioctl version matching the version in << parameters.cluster >>.json
-          command: bash scripts/install_istioctl_by_version.sh << parameters.cluster >>
+      # - run: 
+      #     name: install the istioctl version matching the version in << parameters.cluster >>.json
+      #     command: bash scripts/install_istioctl_by_version.sh << parameters.cluster >>
+      - kube-ops/packages:
+          istioctl-version: << pipeline.parameters.istioctl-version >>
       - run:
           name: deploy istio operator and matching version manifest
           command: bash scripts/deploy_istio.sh << parameters.cluster >>
       - run:
           name: deploy external-dns
           command: bash scripts/deploy_external_dns.sh << parameters.cluster >>
-      - run:
-          name: deploy cert-manager
-          command: bash scripts/deploy_cert_manager.sh << parameters.cluster >>
-      - run:
-          name: deploy cluster certificate issuer
-          command: bash scripts/deploy_cert_issuer.sh << parameters.cluster >>
-      - run:
-          name: deploy default cluster environment gateways and certificates
-          command: bash scripts/deploy_default_gateways.sh << parameters.cluster >>
-      - run:
-          name: deploy default cluster mtls namespace
-          command: kubectl apply -f tpl/default-mtls-namespace.yaml
+      # - run:
+      #     name: deploy cert-manager
+      #     command: bash scripts/deploy_cert_manager.sh << parameters.cluster >>
+      # - run:
+      #     name: deploy cluster certificate issuer
+      #     command: bash scripts/deploy_cert_issuer.sh << parameters.cluster >>
+      # - run:
+      #     name: deploy default cluster environment gateways and certificates
+      #     command: bash scripts/deploy_default_gateways.sh << parameters.cluster >>
+      # - run:
+      #     name: deploy default cluster mtls namespace
+      #     command: kubectl apply -f tpl/default-mtls-namespace.yaml
 
   deploy-mesh-tools:
     parameters:
@@ -111,12 +147,12 @@ commands:
       - run:
           name: validate cert-manager deployment
           command: CLUSTER=<< parameters.cluster >> bats test/validate_cert_manager.bats
-      - run:
-          name: validate default ingress and certificates
-          command: bash scripts/validate_ingress.sh << parameters.cluster >>
-      - run:
-          name: validate mesh tools
-          command: CLUSTER=<< parameters.cluster >> bats test/validate_mesh_tools.bats
+      # - run:
+      #     name: validate default ingress and certificates
+      #     command: bash scripts/validate_ingress.sh << parameters.cluster >>
+      # - run:
+      #     name: validate mesh tools
+      #     command: CLUSTER=<< parameters.cluster >> bats test/validate_mesh_tools.bats
   
 jobs:
   deploy-servicemesh:
@@ -134,8 +170,8 @@ jobs:
           cluster: << parameters.cluster >>
       - deploy-servicemesh-components:
           cluster: << parameters.cluster >>
-      - deploy-mesh-tools:
-          cluster: << parameters.cluster >>
+      # - deploy-mesh-tools:
+      #     cluster: << parameters.cluster >>
       - validate-servicemesh:
           cluster: << parameters.cluster >>
       

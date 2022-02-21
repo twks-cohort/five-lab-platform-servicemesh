@@ -1,5 +1,5 @@
 terraform {
-  required_version = "~> 1.0"
+  required_version = "~> 1.1"
   required_providers {
     aws = {
       source  = "hashicorp/aws"
@@ -23,14 +23,18 @@ provider "aws" {
   }
 }
 
-data "terraform_remote_state" "eks" {
-  backend = "remote" 
+// data "terraform_remote_state" "eks" {
+//   backend = "remote" 
 
-  config = {
-    hostname     = "app.terraform.io"
-    organization = "twdps"
-    workspaces   = {
-      name = "lab-platform-eks-${var.cluster_name}"
-    }
-  }
+//   config = {
+//     hostname     = "app.terraform.io"
+//     organization = "twdps"
+//     workspaces   = {
+//       name = "lab-platform-eks-${var.cluster_name}"
+//     }
+//   }
+// }
+
+data "aws_eks_cluster" "cluster" {
+  name = "${var.cluster_name}"
 }

@@ -7,22 +7,23 @@ export EXTERNAL_DNS_VERSION=$(cat $CLUSTER.json | jq -r .external_dns_version)
 export SAME_ACCOUNT_DOMAIN=$(cat $CLUSTER.json | jq -r .same_account_domain)
 export CROSS_ACCOUNT_DOMAIN=$(cat $CLUSTER.json | jq -r .cross_account_domain)
 
-cat <<EOF > external-dns-deployment.yaml
+cat <<EOF > external-dns/service-account.yaml
 ---
 apiVersion: v1
 kind: ServiceAccount
 metadata:
-  name: $CLUSTER-external-dns
+  name: external-dns
   namespace: kube-system
   annotations:
     eks.amazonaws.com/role-arn: arn:aws:iam::${AWS_ACCOUNT_ID}:role/${CLUSTER}-external-dns
+EOF
 
+cat <<EOF > external-dns/role-bindings.yaml
 ---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
 metadata:
   name: external-dns
-  namespace: kube-system
 rules:
 - apiGroups: [""]
   resources: ["services","endpoints","pods"]
@@ -33,25 +34,23 @@ rules:
 - apiGroups: [""]
   resources: ["nodes"]
   verbs: ["list","watch"]
-- apiGroups: ["networking.istio.io"]
-  resources: ["gateways", "virtualservices"]
-  verbs: ["get","watch","list"]
 
 ---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRoleBinding
 metadata:
   name: external-dns-viewer
-  namespace: kube-system
 roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: ClusterRole
   name: external-dns
 subjects:
 - kind: ServiceAccount
-  name: ${CLUSTER}-external-dns
+  name: external-dns
   namespace: kube-system
+EOF
 
+cat <<EOF > external-dns/deployment.yaml
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -69,7 +68,7 @@ spec:
       labels:
         app: external-dns
     spec:
-      serviceAccountName: $CLUSTER-external-dns
+      serviceAccountName: external-dns
       containers:
       - name: external-dns
         image: k8s.gcr.io/external-dns/external-dns:v${EXTERNAL_DNS_VERSION}
@@ -90,6 +89,6 @@ spec:
         fsGroup: 65534 # For ExternalDNS to be able to read Kubernetes and AWS token files
 EOF
 
-kubectl apply -f external-dns-deployment.yaml
+kubectl apply -f external-dns/ --recursive
 
 sleep 10
