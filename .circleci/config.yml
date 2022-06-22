@@ -134,7 +134,8 @@ commands:
   
 jobs:
   deploy-servicemesh:
-    executor: << pipeline.parameters.executor-image >>
+    docker:
+      - image: << pipeline.parameters.executor-image >>
     shell: << parameters.shell >>
     parameters:
       cluster:
@@ -153,7 +154,7 @@ jobs:
       - setup_remote_docker
       - set-environment:
           cluster: << parameters.cluster >>
-          env-file: << parameters.source-env >>
+          source-env: << parameters.source-env >>
       - do/circle-deploy
       - do/slack-webhook:
           message: lab-platform-servicemesh << parameters.cluster >>
