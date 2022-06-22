@@ -180,7 +180,7 @@ workflows:
           before-terraform:
             - set-environment:
                 cluster: sandbox-us-east-2
-                source-env: op-nonprod.env
+                source-env: op.nonprod.env
           filters: *on-push-main
 
       - deploy-servicemesh:
@@ -203,7 +203,7 @@ workflows:
           before-terraform:
             - set-environment:
                 cluster: prod-us-east-1
-                source-env: op-prod.env
+                source-env: op.prod.env
           filters: *on-tag-main
 
       - deploy-servicemesh:
