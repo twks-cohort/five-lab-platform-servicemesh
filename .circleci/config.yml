@@ -75,7 +75,7 @@ commands:
           webhook-url: $LAB_EVENTS_CHANNEL_WEBHOOK
       - run:
           name: deploy istio operator and matching version manifest
-          command: bash scripts/deploy_istio.sh << parameters.cluster >>
+          command: bash scripts/deploy_istio.sh << parameters.cluster >> inplace
       - run:
           name: deploy external-dns
           command: bash scripts/deploy_external_dns.sh << parameters.cluster >>
@@ -155,10 +155,6 @@ jobs:
       - set-environment:
           cluster: << parameters.cluster >>
           source-env: << parameters.source-env >>
-      - do/circle-deploy
-      - do/slack-webhook:
-          message: lab-platform-servicemesh << parameters.cluster >>
-          webhook-url: $LAB_EVENTS_CHANNEL_WEBHOOK
       - deploy-servicemesh-components:
           cluster: << parameters.cluster >>
       - deploy-mesh-tools:

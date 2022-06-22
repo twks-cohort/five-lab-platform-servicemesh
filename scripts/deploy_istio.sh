@@ -9,8 +9,8 @@ set -e
 #      inplace: just do in-place install and upgrade
 # $2 = cluster config to use
 
-export CHANGE=${1}
-export CLUSTER=${2}
+export CLUSTER=${1}
+export CHANGE=${2}
 export REVISION_VERSION=$(cat $CLUSTER.auto.tfvars.json | jq -r .istio_version)
 export REVISION_LABEL=$(echo "${REVISION_VERSION}" | sed -r 's/[.]+/-/g')
 
