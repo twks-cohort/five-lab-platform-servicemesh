@@ -1,20 +1,19 @@
 #!/usr/bin/env bash
 
 export CLUSTER=$1
-export DOMAIN=$2
 
-cat <<EOF > httpbin.$CLUSTER.$DOMAIN.yaml
+cat <<EOF > httpbin-twdps-io-gateway.yaml
 ---
-apiVersion: networking.istio.io/v1alpha3
+apiVersion: networking.istio.io/v1beta1
 kind: VirtualService
 metadata:
   name: httpbin
   namespace: default-mtls
 spec:
   hosts:
-  - "httpbin.$CLUSTER.$DOMAIN"
+  - "httpbin.$CLUSTER.twdps.io"
   gateways:
-  - istio-system/$CLUSTER-wildcard-gateway
+  - istio-system/$CLUSTER-twdps-io-gateway
   http:
     - route:
       - destination:
@@ -70,4 +69,4 @@ spec:
         - containerPort: 80
 EOF
 
-kubectl apply -f httpbin.$CLUSTER.$DOMAIN.yaml
+kubectl apply -f httpbin-twdps-io-gateway.yaml

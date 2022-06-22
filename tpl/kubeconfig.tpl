@@ -1,1 +1,1 @@
-{{ twdps/di/platform/env/$env/cluster/kubeconfig }}
+{{ op://empc-lab/platform-$ENV/kubeconfig }}

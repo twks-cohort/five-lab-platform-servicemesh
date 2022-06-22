@@ -3,7 +3,7 @@
 # parameters
 # $1 = cluster config to use
 export CLUSTER=${1}
-export ISTIO_VERSION=$(cat $CLUSTER.json | jq -r .istio_version)
+export KIALI_VERSION=$(cat environments/$CLUSTER.install.json | jq -r .kiali_version)
 
 # This option installs the Kiali Operator and the Kiali CR for latest. It uses a non-default setting
 # for accessible-namespaces making all current and future namespaces accessible to Kiali.
@@ -11,8 +11,8 @@ export ISTIO_VERSION=$(cat $CLUSTER.json | jq -r .istio_version)
 # cluster role permissions and is not recommended for production.
 
 kubectl apply -f tpl/kiali-namespace.yaml
-helm install --set cr.create=true --set cr.namespace=istio-system --namespace kiali-operator --repo https://kiali.org/helm-charts kiali-operator kiali-operator
+helm upgrade --install --version $KIALI_VERSION --set cr.create=true --set cr.namespace=istio-system --namespace kiali-operator --repo https://kiali.org/helm-charts kiali-operator kiali-operator
 sleep 40
 
 kubectl get secrets -o json -n istio-system | jq -r '.items[] | select(.metadata.name | test("kiali-service-account")).data.token' > kiali-token
-cat kiali-token | base64 -d | secrethub write twdps/di/platform/env/$CLUSTER/cluster/kiali-token
+cat kiali-token | base64 -d | opw write platform-$CLUSTER kiali-token -

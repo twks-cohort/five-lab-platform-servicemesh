@@ -2,11 +2,10 @@
 version: 2.1
 
 orbs:
-  terraform: twdps/terraform@0.4.0
-  # can override kubectl, awspec versions as necessary
+  terraform: twdps/terraform@0.6.0
   kube: twdps/kube-ops@0.2.0
-  # used for github-release-notes feature
-  executor-tools: twdps/executor-tools@0.2.0
+  op: twdps/onepassword@1.0.0
+  do: twdps/pipeline-events@0.1.0
 
 # ==== global pipeline parameters
 
@@ -14,36 +13,17 @@ parameters:
   context:
     description: circleci context for all jobs
     type: string
-    default: twdps-core-labs-team
-  shell-options:
-    description: shell options for all jobs
-    type: string
-    default: secrethub run --env-file secrethub.nonprod.env -- /bin/bash -eo pipefail
   terraform-version:
     description: terraform version for all jobs
     type: string
-    default: "1.1.5"
-  datadog-version:
-    description: datadog cli version for all jobs
-    type: string
-    default: "0.43.0"
-  istioctl-version:
-    description: istioctl cli version for all jobs
-    type: string
-    default: "1.13.0"
+    default: "1.2.2"
   executor-image:
     description: image to use for local jobs
     type: string
-    default: twdps/circleci-kube-ops:alpine-0.5.0
+    default: twdps/circleci-kube-ops:alpine-0.7.0
 
+# ==== triggers
 
-
-# executors:
-#   infra-image:
-#     docker:
-#       - image: twdps/di-circleci-infra-image:stable
-#     shell: secrethub run -- /bin/sh -eo pipefail
-      
 on-push-main: &on-push-main
   branches:
     only: /main/
@@ -63,22 +43,23 @@ commands:
       cluster:
         description: target kubernetes cluster
         type: string
-        default: $CLUSTER
+      source-env:
+        description: file to source to BASH_ENV
+        type: string
     steps:
+      - op/env: 
+          env-file: << parameters.source-env >>
       - run:
           name: write << parameters.cluster >>.auto.tfvars.json from template
-          command: secrethub inject -i environments/<< parameters.cluster >>.auto.tfvars.json.tpl -o << parameters.cluster >>.auto.tfvars.json
-      - run:
-          name: write << parameters.cluster >>.json from template
-          command: secrethub inject -i environments/<< parameters.cluster >>.json.tpl -o << parameters.cluster >>.json
+          command: op inject -i environments/<< parameters.cluster >>.auto.tfvars.json.tpl -o << parameters.cluster >>.auto.tfvars.json
       - run:
           name: set ~/.terraformrc
-          command: secrethub inject -i tpl/terraformrc.tpl -o ~/.terraformrc
+          command: op inject -i tpl/terraformrc.tpl -o ~/.terraformrc
       - run:
           name: pull kubeconfig
           command: |
             mkdir -p ~/.kube
-            SECRETHUB_VAR_ENV=<< parameters.cluster >> secrethub inject -i tpl/kubeconfig.tpl -o ~/.kube/config
+            ENV=<< parameters.cluster >> op inject -i tpl/kubeconfig.tpl -o ~/.kube/config
 
   deploy-servicemesh-components:
     parameters:
@@ -87,29 +68,28 @@ commands:
         type: string
         default: $CLUSTER
     steps:
-      # - run: 
-      #     name: install the istioctl version matching the version in << parameters.cluster >>.json
-      #     command: bash scripts/install_istioctl_by_version.sh << parameters.cluster >>
-      - kube-ops/packages:
-          istioctl-version: << pipeline.parameters.istioctl-version >>
+      - do/circle-deploy
+      - do/slack-webhook:
+          message: lab-platform-servicemesh << parameters.cluster >> deployment
+          webhook-url: $LAB_EVENTS_CHANNEL_WEBHOOK
       - run:
           name: deploy istio operator and matching version manifest
           command: bash scripts/deploy_istio.sh << parameters.cluster >>
       - run:
           name: deploy external-dns
           command: bash scripts/deploy_external_dns.sh << parameters.cluster >>
-      # - run:
-      #     name: deploy cert-manager
-      #     command: bash scripts/deploy_cert_manager.sh << parameters.cluster >>
-      # - run:
-      #     name: deploy cluster certificate issuer
-      #     command: bash scripts/deploy_cert_issuer.sh << parameters.cluster >>
-      # - run:
-      #     name: deploy default cluster environment gateways and certificates
-      #     command: bash scripts/deploy_default_gateways.sh << parameters.cluster >>
-      # - run:
-      #     name: deploy default cluster mtls namespace
-      #     command: kubectl apply -f tpl/default-mtls-namespace.yaml
+      - run:
+          name: deploy cert-manager
+          command: bash scripts/deploy_cert_manager.sh << parameters.cluster >>
+      - run:
+          name: deploy cluster certificate issuer
+          command: bash scripts/deploy_cert_issuer.sh << parameters.cluster >>
+      - run:
+          name: deploy default cluster environment gateways and certificates
+          command: bash scripts/deploy_gateways.sh << parameters.cluster >>
+      - run:
+          name: deploy default cluster mtls namespace
+          command: kubectl apply -f tpl/default-mtls-namespace.yaml
 
   deploy-mesh-tools:
     parameters:
@@ -127,9 +107,6 @@ commands:
       - run:
           name: deploy all-in-one jaeger
           command: bash scripts/deploy_jaeger.sh << parameters.cluster >>
-      - run:
-          name: deploy kiali
-          command: bash scripts/deploy_kiali.sh << parameters.cluster >>
 
   validate-servicemesh:
     parameters:
@@ -147,31 +124,43 @@ commands:
       - run:
           name: validate cert-manager deployment
           command: CLUSTER=<< parameters.cluster >> bats test/validate_cert_manager.bats
-      # - run:
-      #     name: validate default ingress and certificates
-      #     command: bash scripts/validate_ingress.sh << parameters.cluster >>
-      # - run:
-      #     name: validate mesh tools
-      #     command: CLUSTER=<< parameters.cluster >> bats test/validate_mesh_tools.bats
+      - run:
+          name: validate default ingress and certificates
+          command: bash scripts/validate_ingress.sh << parameters.cluster >>
+      - run:
+          name: validate mesh tools
+          command: CLUSTER=<< parameters.cluster >> bats test/validate_mesh_tools.bats
   
 jobs:
   deploy-servicemesh:
-    executor: infra-image
-    shell: secrethub run --env-file secrethub.nonprod.env -- /bin/sh -eo pipefail
+    executor: << pipeline.parameters.executor-image >>
+    shell: << parameters.shell >>
     parameters:
       cluster:
         description: target kubernetes cluster
         type: string
         default: ""
+      shell:
+        description: shell option directive
+        type: string
+        default: /bin/bach -eo pipefail
+      source-env:
+        description: env file to source to BASH_ENV
+        type: string
     steps:
       - checkout
       - setup_remote_docker
       - set-environment:
           cluster: << parameters.cluster >>
+          env-file: << parameters.source-env >>
+      - do/circle-deploy
+      - do/slack-webhook:
+          message: lab-platform-servicemesh << parameters.cluster >>
+          webhook-url: $LAB_EVENTS_CHANNEL_WEBHOOK
       - deploy-servicemesh-components:
           cluster: << parameters.cluster >>
-      # - deploy-mesh-tools:
-      #     cluster: << parameters.cluster >>
+      - deploy-mesh-tools:
+          cluster: << parameters.cluster >>
       - validate-servicemesh:
           cluster: << parameters.cluster >>
       
@@ -179,41 +168,48 @@ jobs:
 workflows:
   version: 2
 
-  lab-platform-servicemesh-pipeline:
+  deploy servicemesh to sandbox-us-east-2:
     jobs:
       - terraform/apply:
-          name: apply-sandbox-roles
-          context: twdps-di
-          shell: secrethub run --env-file secrethub.nonprod.env -- /bin/sh -eo pipefail
-          workspace: sandbox
+          name: deploy sandbox-us-east-2 eks service account roles
+          context: << pipeline.parameters.context >>
+          shell: op run --env-file=op.nonprod.env -- /bin/bash -eo pipefail
+          workspace: sandbox-us-east-2
           before-terraform:
             - set-environment:
-                cluster: sandbox
+                cluster: sandbox-us-east-2
+                source-env: op-nonprod.env
           filters: *on-push-main
 
       - deploy-servicemesh:
-          name: deploy-sandbox-servicemesh
-          context: twdps-di
-          cluster: sandbox
+          name: deploy sandbox-us-east-2 servicemesh
+          context: << pipeline.parameters.context >>
+          shell: op run --env-file=op.nonprod.env -- /bin/bash -eo pipefail
+          source-env: op.nonprod.env
+          cluster: sandbox-us-east-2
           requires:
-            - apply-sandbox-roles
+            - deploy sandbox-us-east-2 eks service account roles
           filters: *on-push-main
       
-      # release to preview
+  release servicemesh to prod-us-east-1:
+    jobs:
       - terraform/apply:
-          name: apply-preview-roles
-          context: twdps-di
-          shell: secrethub run --env-file secrethub.nonprod.env -- /bin/sh -eo pipefail
-          workspace: preview
+          name: deploy prod-us-east-1 eks service account roles
+          context: << pipeline.parameters.context >>
+          shell:  op run --env-file=op.prod.env -- /bin/bash -eo pipefail
+          workspace: prod-us-east-1
           before-terraform:
             - set-environment:
-                cluster: preview
+                cluster: prod-us-east-1
+                source-env: op-prod.env
           filters: *on-tag-main
 
       - deploy-servicemesh:
-          name: deploy-preview-servicemesh
-          context: twdps-di
-          cluster: preview
+          name: release prod-us-east-1 servicemesh
+          context: << pipeline.parameters.context >>
+          shell:  op run --env-file=op.prod.env -- /bin/bash -eo pipefail
+          source-env: op-prod.env
+          cluster: prod-us-east-1
           requires:
-            - apply-preview-roles
+            - deploy prod-us-east-1 eks service account roles
           filters: *on-tag-main

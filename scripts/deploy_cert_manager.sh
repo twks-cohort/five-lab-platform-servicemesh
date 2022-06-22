@@ -2,8 +2,9 @@
 set -e
 
 export CLUSTER=${1}
-export CERT_MANAGER_VERSION=$(cat ${CLUSTER}.json | jq -r '.cert_manager_version')
-export AWS_ACCOUNT_ID=$(cat ${CLUSTER}.auto.tfvars.json | jq -r .account_id)
+export AWS_ACCOUNT_ID=$(cat ${CLUSTER}.auto.tfvars.json | jq -r .aws_account_id)
+export CERT_MANAGER_VERSION=$(cat environments/${CLUSTER}.install.json | jq -r '.cert_manager_chart_version')
+
 
 kubectl apply -f tpl/cert-manager-namespace.yaml
 

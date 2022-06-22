@@ -1,0 +1,16 @@
+{
+  "istio_version": "1.14.0",
+  "external_dns_version": "0.12.0",
+  "cert_manager_chart_version": "1.8.1",
+  "kiali_version": "1.52.0",
+
+  "cluster_domains": [
+    "twdps.digital",
+    "sandbox-us-east-2.twdps.digital",
+    "sandbox-us-east-2.twdps.io",
+    "preview.twdps.digital",
+    "preview.twdps.io"
+  ],
+  "issuerEndpoint": "https://acme-v02.api.letsencrypt.org/directory",
+  "issuerEmail": "twdps.io@gmail.com"
+}
