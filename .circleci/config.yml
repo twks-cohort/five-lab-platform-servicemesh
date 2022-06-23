@@ -200,7 +200,7 @@ workflows:
             - set-environment:
                 cluster: prod-us-east-1
                 source-env: op.prod.env
-          filters: *on-push-main
+          filters: *on-tag-main
 
       - deploy-servicemesh:
           name: release prod-us-east-1 servicemesh
@@ -210,4 +210,4 @@ workflows:
           cluster: prod-us-east-1
           requires:
             - deploy service account roles for prod-us-east-1
-          filters: *on-push-main
+          filters: *on-tag-main

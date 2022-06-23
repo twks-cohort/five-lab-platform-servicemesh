@@ -67,6 +67,10 @@ A `default-mtls` namespace is deployed to each cluster for validate and testing 
 ```
 $ istioctl dashboard controlz <pod-name[.namespace]>
 $ istioctl dashboard envoy <pod-name[.namespace]>
+$ istioctl dashboard prometheus
+$ istioctl dashboard grafana
+$ istioctl dashboard jaeger
+$ istioctl dashboard kiali   # use kiali token for respective cluster found in empc-lab op vault
 ```
 ## upgrades
 
