@@ -14,8 +14,6 @@ export CHANGE=${2}
 export REVISION_VERSION=$(cat environments/$CLUSTER.install.json | jq -r .istio_version)
 export REVISION_LABEL=$(echo "${REVISION_VERSION}" | sed -r 's/[.]+/-/g')
 
-istio-${REVISION_VERSION}/bin/istioctl install -y -f istio-configuration/set-istio-${REVISION_VERSION}.yaml
-
 
 # deploy a revision
 function revision_deploy() {
