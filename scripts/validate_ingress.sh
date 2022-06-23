@@ -9,4 +9,4 @@ sleep 10
 
 bats test/validate_twdps_io.bats
 
-#kubectl delete -f httpbin-twdps-io-gateway.yaml
+kubectl delete -f httpbin-twdps-io-gateway.yaml

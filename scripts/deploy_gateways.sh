@@ -66,3 +66,4 @@ kubectl apply -f $domain-gateway.yaml
 
 done
 
+sleep 20
