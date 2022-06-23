@@ -166,28 +166,28 @@ jobs:
 workflows:
   version: 2
 
-  # deploy servicemesh to sandbox-us-east-2:
-  #   jobs:
-  #     - terraform/apply:
-  #         name: deploy service account roles for sandbox-us-east-2 cluster
-  #         context: << pipeline.parameters.context >>
-  #         shell: op run --env-file=op.nonprod.env -- /bin/bash -eo pipefail
-  #         workspace: sandbox-us-east-2
-  #         before-terraform:
-  #           - set-environment:
-  #               cluster: sandbox-us-east-2
-  #               source-env: op.nonprod.env
-  #         filters: *on-push-main
+  deploy servicemesh to sandbox-us-east-2:
+    jobs:
+      - terraform/apply:
+          name: deploy service account roles for sandbox-us-east-2 cluster
+          context: << pipeline.parameters.context >>
+          shell: op run --env-file=op.nonprod.env -- /bin/bash -eo pipefail
+          workspace: sandbox-us-east-2
+          before-terraform:
+            - set-environment:
+                cluster: sandbox-us-east-2
+                source-env: op.nonprod.env
+          filters: *on-push-main
 
-  #     - deploy-servicemesh:
-  #         name: deploy sandbox-us-east-2 servicemesh
-  #         context: << pipeline.parameters.context >>
-  #         shell: op run --env-file=op.nonprod.env -- /bin/bash -eo pipefail
-  #         source-env: op.nonprod.env
-  #         cluster: sandbox-us-east-2
-  #         requires:
-  #           - deploy service account roles for sandbox-us-east-2 cluster
-  #         filters: *on-push-main
+      - deploy-servicemesh:
+          name: deploy sandbox-us-east-2 servicemesh
+          context: << pipeline.parameters.context >>
+          shell: op run --env-file=op.nonprod.env -- /bin/bash -eo pipefail
+          source-env: op.nonprod.env
+          cluster: sandbox-us-east-2
+          requires:
+            - deploy service account roles for sandbox-us-east-2 cluster
+          filters: *on-push-main
       
   release servicemesh to prod-us-east-1:
     jobs:
