@@ -26,17 +26,12 @@ The Lab servicemesh demonstrates the following configuration.
 
 ### gateways
 
-The following gateways are currently deployed by this pipeline. Note: the pending teams.api release will shift management of standard environment gateways to the api rather than through an infra pipeline.    
+The following gateways are currently deployed by this pipeline. 
 
+Default cluster gateways:  
 
 | gateway                                 | urls                                |  cluster          |
 |-----------------------------------------|-------------------------------------|-------------------|
-| twdps.io-gateway                        | (*.)twdps.io                        | prod-us-east-1    |
-| twdps.digital-gateway                   | (*.)twdps.digital                   | sandbox-us-east-2 |
-| sandbox-us-east-2.twdps.digital-gateway | (*.)sandbox-us-east-2.twdps.digital | sandbox-us-east-2 |
-| sandbox-us-east-2.twdps.io-gateway      | (*.)sandbox-us-east-2.twdps.io      | sandbox-us-east-2 |
-| prod-us-east-1.twdps.digital-gateway    | (*.)prod-us-east-1.twdps.digital    | prod-us-east-1    |
-| prod-us-east-1.twdps.io-gateway         | (*.)prod-us-east-1.twdps.io         | prod-us-east-1    |
 | dev.twdps.digital-gateway               | (*.)dev.twdps.digital               | prod-us-east-1    |
 | dev.twdps.io-gateway                    | (*.)dev.twdps.io                    | prod-us-east-1    |
 | qa.twdps.digital-gateway                | (*.)qa.twdps.digital                | prod-us-east-1    |
@@ -45,10 +40,23 @@ The following gateways are currently deployed by this pipeline. Note: the pendin
 | preview.twdps.io-gateway                | (*.)preview.twdps.io                | sandbox-us-east-2 |
 | prod.twdps.digital-gateway              | (*.)prod.twdps.digital              | prod-us-east-1    |
 | prod.twdps.io-gateway                   | (*.)prod.twdps.io                   | prod-us-east-1    |
+| twdps.io-gateway                        | (*.)twdps.io                        | prod-us-east-1    |
+| twdps.digital-gateway                   | (*.)twdps.digital                   | sandbox-us-east-2 |
+
+Namespace environment gateways:  
+
+| gateway                                 | urls                                |  cluster          |
+|-----------------------------------------|-------------------------------------|-------------------|
+| sandbox-us-east-2.twdps.digital-gateway | (*.)sandbox-us-east-2.twdps.digital | sandbox-us-east-2 |
+| sandbox-us-east-2.twdps.io-gateway      | (*.)sandbox-us-east-2.twdps.io      | sandbox-us-east-2 |
+| prod-us-east-1.twdps.digital-gateway    | (*.)prod-us-east-1.twdps.digital    | prod-us-east-1    |
+| prod-us-east-1.twdps.io-gateway         | (*.)prod-us-east-1.twdps.io         | prod-us-east-1    |
 
 A typical external->internal routing patterns for domains would be:  
 
-api.twdps.io      >  api-gateway  >  api.prod.preview.twdps.io 
+api.twdps.io      >  api-gateway  >  api.prod.preview.twdps.io  
+
+Note: the pending teams.api release will shift management of standard environment gateways to the api rather than through an infra pipeline.    
 
 ## Default namespace
 
