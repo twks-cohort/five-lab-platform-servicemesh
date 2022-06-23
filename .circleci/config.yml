@@ -206,7 +206,7 @@ workflows:
           name: release prod-us-east-1 servicemesh
           context: << pipeline.parameters.context >>
           shell:  op run --env-file=op.prod.env -- /bin/bash -eo pipefail
-          source-env: op-prod.env
+          source-env: op.prod.env
           cluster: prod-us-east-1
           requires:
             - deploy service account roles for prod-us-east-1
