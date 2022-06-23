@@ -90,7 +90,7 @@ commands:
           command: bash scripts/deploy_gateways.sh << parameters.cluster >>
       - run:
           name: deploy default cluster mtls namespace
-          command: kubectl apply -f tpl/default-mtls-namespace.yaml
+          command: kubectl apply -f tpl/lab-system-mtls-namespace.yaml
 
   deploy-mesh-tools:
     parameters:
