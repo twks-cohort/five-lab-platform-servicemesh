@@ -54,7 +54,7 @@ if [[ $CHANGE == "revision" ]]; then
   # if the current prod-stable revision is equal to the .istio_version then do nothing, warn
   if [[ $CURRENT_REVISION == $REVISION_VERSION ]]; then
     echo "the current prod-stable revision is already the same as the .istio_version, nothing to do"
-    exit (1)
+    exit 1
   fi
 
   revision_deploy $ISTIO_VERSION
