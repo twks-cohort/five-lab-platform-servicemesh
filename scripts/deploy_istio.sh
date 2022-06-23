@@ -63,6 +63,7 @@ if [[ $CHANGE == "revision" ]]; then
 # swap istio from prod-stable to prod-canary
 elif [[ $CHANGE == "swap" ]]; then
 
+  echo "swap"
   # if the prod-stable revision is equal to the $REVISION_LABEL revision then do nothing, warn
 
   # swap
@@ -73,6 +74,7 @@ elif [[ $CHANGE == "swap" ]]; then
 # remove the canary revision
 elif [[ $CHANGE == "drop" ]]; then
 
+  echo "drop"
   # if there is to prod-canary revision then do nothing, warn
 
   # CANARY_VERSION = fetch prob-canary revision
