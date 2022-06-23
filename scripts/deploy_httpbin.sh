@@ -8,7 +8,7 @@ apiVersion: networking.istio.io/v1beta1
 kind: VirtualService
 metadata:
   name: httpbin
-  namespace: default-mtls
+  namespace: lab-system-mtls
 spec:
   hosts:
   - "httpbin.$CLUSTER.twdps.io"
@@ -17,7 +17,7 @@ spec:
   http:
     - route:
       - destination:
-          host: httpbin.default-mtls.svc.cluster.local
+          host: httpbin.lab-system-mtls.svc.cluster.local
           port:
             number: 8000
 
@@ -26,7 +26,7 @@ apiVersion: v1
 kind: Service
 metadata:
   name: httpbin
-  namespace: default-mtls
+  namespace: lab-system-mtls
   labels:
     app: httpbin
 spec:
@@ -42,14 +42,14 @@ apiVersion: v1
 kind: ServiceAccount
 metadata:
   name: httpbin
-  namespace: default-mtls
+  namespace: lab-system-mtls
 
 ---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: httpbin
-  namespace: default-mtls
+  namespace: lab-system-mtls
 spec:
   replicas: 2
   selector:
