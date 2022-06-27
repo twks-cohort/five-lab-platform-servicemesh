@@ -84,7 +84,9 @@ commands:
           command: bash scripts/deploy_cert_manager.sh << parameters.cluster >>
       - run:
           name: deploy cluster certificate issuer
-          command: bash scripts/deploy_cert_issuer.sh << parameters.cluster >>
+          command: |
+            bash scripts/define_cert_issuer.sh << parameters.cluster >>
+            bash scripts/deploy_cert_issuer.sh << parameters.cluster >>
       - run:
           name: deploy default cluster environment gateways and certificates
           command: bash scripts/deploy_gateways.sh << parameters.cluster >>
