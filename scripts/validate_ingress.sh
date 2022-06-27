@@ -5,7 +5,7 @@ export CLUSTER=$1
 
 # deploy and test httpbin on same account domain
 bash scripts/deploy_httpbin.sh ${CLUSTER}
-sleep 10
+sleep 30
 
 bats test/validate_twdps_io.bats
 
