@@ -48,7 +48,7 @@ commands:
         description: file to source to BASH_ENV
         type: string
     steps:
-      - op/env: 
+      - op/env:
           env-file: << parameters.source-env >>
       - run:
           name: write << parameters.cluster >>.auto.tfvars.json from template
@@ -112,7 +112,7 @@ commands:
           name: deploy kiali
           command: bash scripts/deploy_kiali.sh << parameters.cluster >>
 
-  validate-servicemesh:
+  validate-servicemesh-components:
     parameters:
       cluster:
         description: target kubernetes cluster
@@ -134,7 +134,7 @@ commands:
       - run:
           name: validate mesh tools
           command: CLUSTER=<< parameters.cluster >> bats test/validate_mesh_tools.bats
-  
+
 jobs:
   deploy-servicemesh:
     docker:
@@ -162,7 +162,32 @@ jobs:
           cluster: << parameters.cluster >>
       - deploy-mesh-tools:
           cluster: << parameters.cluster >>
-      - validate-servicemesh:
+      - validate-servicemesh-components:
+          cluster: << parameters.cluster >>
+
+  validate-servicemesh:
+    docker:
+      - image: << pipeline.parameters.executor-image >>
+    shell: << parameters.shell >>
+    parameters:
+      cluster:
+        description: target kubernetes cluster
+        type: string
+        default: ""
+      shell:
+        description: shell option directive
+        type: string
+        default: /bin/bach -eo pipefail
+      source-env:
+        description: env file to source to BASH_ENV
+        type: string
+    steps:
+      - checkout
+      - setup_remote_docker
+      - set-environment:
+          cluster: << parameters.cluster >>
+          source-env: << parameters.source-env >>
+      - validate-servicemesh-components:
           cluster: << parameters.cluster >>
 
   # update multi-cluster dashboard. Only needs to deploy once for many envs.
@@ -214,7 +239,7 @@ jobs:
           command: pip install -r requirements.txt
       - run:
           name: update datadog cluster monitors
-          command: python scripts/deploy_monitors.py << parameters.cluster >> $(cat << parameters.cluster >>.auto.tfvars.json | jq -r .alert_channel) 
+          command: python scripts/deploy_monitors.py << parameters.cluster >> $(cat << parameters.cluster >>.auto.tfvars.json | jq -r .alert_channel)
 
 workflows:
   version: 2
@@ -296,5 +321,31 @@ workflows:
       - update-dashboard:
           name: update sandbox-us-east-2 dashboard
           context: << pipeline.parameters.context >>
-          shell: op run --env-file=op.nonprod.env -- /bin/bash -eo pipefail 
+          shell: op run --env-file=op.nonprod.env -- /bin/bash -eo pipefail
           filters: *on-push-main
+
+  nightly-validation:
+    triggers:
+      - schedule:
+          cron: "0 0 * * *"
+          filters:
+            branches:
+              only:
+                - main
+    jobs:
+      - validate-servicemesh:
+          name: validate sandbox-us-east-2 servicemesh
+          context: << pipeline.parameters.context >>
+          shell:  op run --env-file op.nonprod.env -- /bin/bash -eo pipefail
+          source-env: op.nonprod.env
+          cluster: sandbox-us-east-2
+      - validate-servicemesh:
+          name: validate prod-us-east-1 servicemesh
+          context: << pipeline.parameters.context >>
+          shell:  op run --env-file op.prod.env -- /bin/bash -eo pipefail
+          source-env: op.prod.env
+          cluster: prod-us-east-1
+      - update-dashboard:
+          name: refresh eks-servicemesh dashboard
+          context: << pipeline.parameters.context >>
+          shell:  op run --env-file op.nonprod.env -- /bin/bash -eo pipefail
