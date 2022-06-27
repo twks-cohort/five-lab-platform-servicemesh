@@ -9,7 +9,7 @@
 	],
 	"options": {
 		"thresholds": {
-			"critical": 3
+			"critical": 1
 		},
 		"notify_audit": false,
 		"require_full_window": false,

@@ -2,14 +2,14 @@
 	"name": "lab-{{ cluster }} jaeger alert",
 	"type": "query alert",
 	"query": "max(last_10m):sum:kubernetes_state.container.ready{cluster:{{ cluster }},container:jaeger} < 1",
-	"message": "@slack-DPS-lab-{{ cluster }}-alerts",
+	"message": "@slack-DPS-lab-{{ alert_channel }}-alerts",
 	"tags": [
 		"cluster:{{ cluster }}",
 		"pipeline:lab-platform-servicemesh"
 	],
 	"options": {
 		"thresholds": {
-			"critical": 3
+			"critical": 1
 		},
 		"notify_audit": false,
 		"require_full_window": false,
