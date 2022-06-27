@@ -47,4 +47,4 @@ do
 EOF
 done
 
-#kubectl apply -f ${CLUSTER}-cluster-issuer.yaml
+kubectl apply -f ${CLUSTER}-cluster-issuer.yaml
