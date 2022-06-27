@@ -21,5 +21,6 @@
 		"new_host_delay": 300,
 		"escalation_message": ""
 	},
-	"priority": null
+	"priority": null,
+	"restricted_roles": null
 }

@@ -4,7 +4,7 @@
 	"query": "max(last_10m):sum:kubernetes_state.deployment.replicas_available{cluster:{{ cluster }},deployment:istio-ingressgateway} < 1",
 	"message": " @slack-DPS-lab-{{ alert_channel }}-alerts",
 	"tags": [
-		"cluster:p{{ cluster }}",
+		"cluster:{{ cluster }}",
 		"pipeline:lab-platform-servicemesh"
 	],
 	"options": {
@@ -21,5 +21,6 @@
 		"new_host_delay": 300,
 		"escalation_message": ""
 	},
-	"priority": null
+	"priority": null,
+	"restricted_roles": null
 }
