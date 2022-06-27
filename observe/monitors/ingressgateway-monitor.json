@@ -1,0 +1,26 @@
+{
+	"name": "lab-{{ cluster }} istiod alert",
+	"type": "query alert",
+	"query": "max(last_10m):sum:kubernetes_state.deployment.replicas_available{cluster:{{ cluster }},deployment:istio-ingressgateway} < 1",
+	"message": " @slack-DPS-lab-{{ cluster }}-alerts",
+	"tags": [
+		"cluster:p{{ cluster }}",
+		"pipeline:lab-platform-eks-servicemesh"
+	],
+	"options": {
+		"thresholds": {
+			"critical": 1
+		},
+		"notify_audit": false,
+		"require_full_window": false,
+		"notify_no_data": false,
+		"renotify_interval": 0,
+		"locked": false,
+		"silenced": {},
+		"include_tags": true,
+		"new_host_delay": 300,
+		"escalation_message": ""
+	},
+	"priority": null,
+	"restricted_roles": null
+}

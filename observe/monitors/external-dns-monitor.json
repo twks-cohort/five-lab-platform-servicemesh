@@ -1,0 +1,25 @@
+{
+	"name": "lab-{{ cluster }} external-dns alert",
+	"type": "query alert",
+	"query": "max(last_10m):sum:kubernetes_state.container.ready{cluster:{{ cluster }},container:external-dns} < 1",
+	"message": "@slack-DPS-lab-{{ cluster }}-alerts",
+	"tags": [
+		"cluster:{{ cluster }}",
+		"pipeline:lab-platform-servicemesh"
+	],
+	"options": {
+		"thresholds": {
+			"critical": 3
+		},
+		"notify_audit": false,
+		"require_full_window": false,
+		"notify_no_data": false,
+		"renotify_interval": 0,
+		"locked": false,
+		"silenced": {},
+		"include_tags": true,
+		"new_host_delay": 300,
+		"escalation_message": ""
+	},
+	"priority": null
+}
