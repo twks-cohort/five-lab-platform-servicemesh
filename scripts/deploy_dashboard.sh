@@ -86,12 +86,12 @@ echo "check production current versions against latest"
 export TABLE_COLOR="green"
 export ALERT_TABLE_COLOR="pink"
 
-if [[ $DESIRED_ISTIO_VERSION != $LATEST_ISTIO_VERSION ]]; then
-  version_alert "New Istio version available: $LATEST_ISTIO_VERSION"
-fi
-if [[ $DESIRED_EXTERNAL_DNS_VERSION != $LATEST_EXTERNAL_DNS_VERSION ]]; then
-  version_alert "New external-dns version available: $LATEST_EXTERNAL_DNS_VERSION"
-fi
+# if [[ $DESIRED_ISTIO_VERSION != $LATEST_ISTIO_VERSION ]]; then
+#   version_alert "New Istio version available: $LATEST_ISTIO_VERSION"
+# fi
+# if [[ $DESIRED_EXTERNAL_DNS_VERSION != $LATEST_EXTERNAL_DNS_VERSION ]]; then
+#   version_alert "New external-dns version available: $LATEST_EXTERNAL_DNS_VERSION"
+# fi
 if [[ $DESIRED_CERT_MANAGER_VERSION != $LATEST_CERT_MANAGER_VERSION ]]; then
   version_alert "New cert-manager version available: $LATEST_CERT_MANAGER_VERSION"
 fi
