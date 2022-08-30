@@ -2,7 +2,7 @@
   "istio_version": "1.14.1",
   "external_dns_version": "0.12.0",
   "cert_manager_chart_version": "1.8.2",
-  "kiali_version": "v1.53.0",
+  "kiali_version": "v1.55.0",
 
   "cluster_domains": [
     "twdps.io",
