@@ -204,6 +204,13 @@ spec:
         prometheus:
           enabled: true
           wasmEnabled: false
+          configOverride:
+            inboundSidecar:
+              metrics:
+                - name: response_bytes
+                  dimensions:
+                    destination_port: string(destination.port)
+                    request_host: request.host
         stackdriver:
           configOverride: {}
           enabled: false
