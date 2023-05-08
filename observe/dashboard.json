@@ -1,6 +1,6 @@
 {
-  "title": "EMPC lab-platform-eks-servicemesh",
-  "description": "[lab-platform-eks-core-services](https://github.com/ThoughtWorks-DPS/lab-platform-eks-servicemesh)",
+  "title": "EMPC five-lab-platform-eks-servicemesh",
+  "description": "[lab-platform-eks-core-services](https://github.com/twks-cohort/five-lab-platform-eks-servicemesh)",
   "widgets": [
     {
       "definition": {
@@ -11,7 +11,7 @@
         "display_format": "countsAndList",
         "color_preference": "text",
         "hide_zero_counts": true,
-        "query": "tag:pipeline:lab-platform-servicemesh",
+        "query": "tag:pipeline:five-lab-platform-servicemesh",
         "sort": "status,asc",
         "count": 50,
         "start": 0,
