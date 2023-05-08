@@ -10,13 +10,13 @@ export CLUSTER_DOMAINS=$(cat environments/$CLUSTER.install.json | jq -r .cluster
 export EMAIL=$(cat environments/$CLUSTER.install.json | jq -r '.issuerEmail')
 export ISSUER_ENDPOINT=$(cat environments/$CLUSTER.install.json | jq -r '.issuerEndpoint')
 
-aws sts assume-role --output json --role-arn arn:aws:iam::$AWS_ACCOUNT_ID:role/$AWS_ASSUME_ROLE --role-session-name lab-platform-servicemesh > credentials
+aws sts assume-role --output json --role-arn arn:aws:iam::$AWS_ACCOUNT_ID:role/$AWS_ASSUME_ROLE --role-session-name five-lab-platform-servicemesh > credentials
 
 export AWS_ACCESS_KEY_ID=$(cat credentials | jq -r ".Credentials.AccessKeyId")
 export AWS_SECRET_ACCESS_KEY=$(cat credentials | jq -r ".Credentials.SecretAccessKey")
 export AWS_SESSION_TOKEN=$(cat credentials | jq -r ".Credentials.SessionToken")
 
-cat <<EOF > ${CLUSTER}-cluster-issuer.yaml
+cat <<EOF >${CLUSTER}-cluster-issuer.yaml
 apiVersion: cert-manager.io/v1
 kind: ClusterIssuer
 metadata:
@@ -36,7 +36,7 @@ declare -a domains=($(echo $CLUSTER_DOMAINS | jq -r '.[]'))
 for domain in "${domains[@]}";
 do
   export ZONE_ID=$(aws route53 list-hosted-zones-by-name | jq --arg name "$domain." -r '.HostedZones | .[] | select(.Name=="\($name)") | .Id')
-  cat <<EOF >> ${CLUSTER}-cluster-issuer.yaml
+  cat <<EOF >>${CLUSTER}-cluster-issuer.yaml
     - selector:
         dnsZones:
           - "$domain"

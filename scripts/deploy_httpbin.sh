@@ -2,7 +2,7 @@
 
 export CLUSTER=$1
 
-cat <<EOF > httpbin-twdps-io-gateway.yaml
+cat <<EOF >httpbin-twdps-io-gateway.yaml
 ---
 apiVersion: networking.istio.io/v1beta1
 kind: VirtualService
@@ -11,9 +11,9 @@ metadata:
   namespace: lab-system-mtls
 spec:
   hosts:
-  - "httpbin.$CLUSTER.twdps.io"
+  - "httpbin.$CLUSTER.cohortscdi-five.com"
   gateways:
-  - istio-system/$CLUSTER-twdps-io-gateway
+  - istio-system/$CLUSTER-cohortscdi-five-com-gateway
   http:
     - route:
       - destination:

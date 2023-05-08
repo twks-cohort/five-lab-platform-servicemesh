@@ -15,4 +15,4 @@ helm upgrade --install --version $KIALI_VERSION --set cr.create=true --set cr.na
 sleep 40
 
 kubectl get secrets -o json -n istio-system | jq -r '.items[] | select(.metadata.name | test("kiali-service-account")).data.token' > kiali-token
-cat kiali-token | base64 -d | opw write platform-$CLUSTER kiali-token -
+cat kiali-token | base64 -d | opw write five-platform-$CLUSTER kiali-token -

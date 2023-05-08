@@ -69,10 +69,10 @@ commands:
         type: string
         default: $CLUSTER
     steps:
-      - do/circle-deploy
-      - do/slack-webhook:
-          message: lab-platform-servicemesh << parameters.cluster >> deployment
-          webhook-url: $LAB_EVENTS_CHANNEL_WEBHOOK
+    #  - do/circle-deploy
+    #  - do/slack-webhook:
+    #      message: lab-platform-servicemesh << parameters.cluster >> deployment
+    #      webhook-url: $LAB_EVENTS_CHANNEL_WEBHOOK
       - run:
           name: deploy istio operator and matching version manifest
           command: bash scripts/deploy_istio.sh << parameters.cluster >> inplace
@@ -150,7 +150,7 @@ jobs:
       shell:
         description: shell option directive
         type: string
-        default: /bin/bach -eo pipefail
+        default: /bin/bash -eo pipefail
       source-env:
         description: env file to source to BASH_ENV
         type: string
@@ -179,7 +179,7 @@ jobs:
       shell:
         description: shell option directive
         type: string
-        default: /bin/bach -eo pipefail
+        default: /bin/bash -eo pipefail
       source-env:
         description: env file to source to BASH_ENV
         type: string
@@ -193,138 +193,138 @@ jobs:
           cluster: << parameters.cluster >>
 
   # update multi-cluster dashboard. Only needs to deploy once for many envs.
-  update-dashboard:
-    parameters:
-      shell:
-        description: shell options
-        type: string
-        default: /bin/bash -eo pipefail
-    docker:
-      - image: << pipeline.parameters.executor-image >>
-    shell: << parameters.shell >>
-    steps:
-      - checkout
-      - setup_remote_docker
-      - set-environment:
-          cluster: sandbox-us-east-2
-          source-env: op.nonprod.env
-      - run:
-          name: install requirements
-          command: pip install -r requirements.txt
-      - run:
-          name: update datadog eks-base dashboard
-          command: bash scripts/deploy_dashboard.sh
+  #update-dashboard:
+  #  parameters:
+  #    shell:
+  #      description: shell options
+  #      type: string
+  #      default: /bin/bash -eo pipefail
+  #  docker:
+  #    - image: << pipeline.parameters.executor-image >>
+  #  shell: << parameters.shell >>
+  #  steps:
+  #    - checkout
+  #    - setup_remote_docker
+  #    - set-environment:
+  #        cluster: nonprod-us-east-2
+  #        source-env: op.nonprod.env
+  #    - run:
+  #        name: install requirements
+  #        command: pip install -r requirements.txt
+  #    - run:
+  #        name: update datadog eks-base dashboard
+  #        command: bash scripts/deploy_dashboard.sh
 
-  update-monitors:
-    parameters:
-      cluster:
-        description: cluster monitors to update
-        type: string
-      shell:
-        description: shell option directive
-        type: string
-        default: /bin/bash -eo pipefail
-      source-env:
-        description: .env file to source into BASH_ENV
-        type: string
-    docker:
-      - image: << pipeline.parameters.executor-image >>
-    shell: << parameters.shell >>
-    steps:
-      - checkout
-      - setup_remote_docker
-      - set-environment:
-          cluster: << parameters.cluster >>
-          source-env: << parameters.source-env >>
-      - run:
-          name: install requirements
-          command: pip install -r requirements.txt
-      - run:
-          name: update datadog cluster monitors
-          command: python scripts/deploy_monitors.py << parameters.cluster >> $(cat << parameters.cluster >>.auto.tfvars.json | jq -r .alert_channel)
+  #update-monitors:
+  #  parameters:
+  #    cluster:
+  #      description: cluster monitors to update
+  #      type: string
+  #    shell:
+  #      description: shell option directive
+  #      type: string
+  #      default: /bin/bash -eo pipefail
+  #    source-env:
+  #      description: .env file to source into BASH_ENV
+  #      type: string
+  #  docker:
+  #    - image: << pipeline.parameters.executor-image >>
+  #  shell: << parameters.shell >>
+  #  steps:
+  #    - checkout
+  #    - setup_remote_docker
+  #    - set-environment:
+  #        cluster: << parameters.cluster >>
+  #        source-env: << parameters.source-env >>
+  #    - run:
+  #        name: install requirements
+  #        command: pip install -r requirements.txt
+  #    - run:
+  #        name: update datadog cluster monitors
+  #        command: python scripts/deploy_monitors.py << parameters.cluster >> $(cat << parameters.cluster >>.auto.tfvars.json | jq -r .alert_channel)
 
 workflows:
   version: 2
 
-  deploy servicemesh to sandbox-us-east-2:
+  deploy servicemesh to nonprod-us-east-2:
     jobs:
       - terraform/apply:
-          name: deploy service account roles for sandbox-us-east-2 cluster
+          name: deploy service account roles for nonprod-us-east-2 cluster
           context: << pipeline.parameters.context >>
           shell: op run --env-file=op.nonprod.env -- /bin/bash -eo pipefail
-          workspace: sandbox-us-east-2
+          workspace: nonprod-us-east-2
           before-terraform:
             - set-environment:
-                cluster: sandbox-us-east-2
+                cluster: nonprod-us-east-2
                 source-env: op.nonprod.env
           filters: *on-push-main
 
       - deploy-servicemesh:
-          name: deploy sandbox-us-east-2 servicemesh
+          name: deploy nonprod-us-east-2 servicemesh
           context: << pipeline.parameters.context >>
           shell: op run --env-file=op.nonprod.env -- /bin/bash -eo pipefail
           source-env: op.nonprod.env
-          cluster: sandbox-us-east-2
+          cluster: nonprod-us-east-2
           requires:
-            - deploy service account roles for sandbox-us-east-2 cluster
+            - deploy service account roles for nonprod-us-east-2 cluster
           filters: *on-push-main
 
-  release servicemesh to prod-us-east-1:
-    jobs:
-      - terraform/apply:
-          name: deploy service account roles for prod-us-east-1
-          context: << pipeline.parameters.context >>
-          shell:  op run --env-file=op.prod.env -- /bin/bash -eo pipefail
-          workspace: prod-us-east-1
-          before-terraform:
-            - set-environment:
-                cluster: prod-us-east-1
-                source-env: op.prod.env
-          filters: *on-tag-main
+  #release servicemesh to prod-us-east-1:
+  #  jobs:
+  #    - terraform/apply:
+  #        name: deploy service account roles for prod-us-east-1
+  #        context: << pipeline.parameters.context >>
+  #        shell:  op run --env-file=op.prod.env -- /bin/bash -eo pipefail
+  #        workspace: prod-us-east-1
+  #        before-terraform:
+  #          - set-environment:
+  #              cluster: prod-us-east-1
+  #              source-env: op.prod.env
+  #        filters: *on-tag-main
 
-      - deploy-servicemesh:
-          name: release prod-us-east-1 servicemesh
-          context: << pipeline.parameters.context >>
-          shell:  op run --env-file=op.prod.env -- /bin/bash -eo pipefail
-          source-env: op.prod.env
-          cluster: prod-us-east-1
-          requires:
-            - deploy service account roles for prod-us-east-1
-          filters: *on-tag-main
+  #    - deploy-servicemesh:
+  #        name: release prod-us-east-1 servicemesh
+  #        context: << pipeline.parameters.context >>
+  #        shell:  op run --env-file=op.prod.env -- /bin/bash -eo pipefail
+  #        source-env: op.prod.env
+  #        cluster: prod-us-east-1
+  #        requires:
+  #          - deploy service account roles for prod-us-east-1
+  #        filters: *on-tag-main
 
-  deploy servicemesh monitors:
-    jobs:
-      - update-monitors:
-          name: update sandbox-us-east-2 monitors
-          context: << pipeline.parameters.context >>
-          shell:  op run --env-file op.nonprod.env -- /bin/bash -eo pipefail
-          source-env: op.nonprod.env
-          cluster: sandbox-us-east-2
-          filters: *on-push-main
+  #deploy servicemesh monitors:
+  #  jobs:
+  #    - update-monitors:
+  #        name: update nonprod-us-east-2 monitors
+  #        context: << pipeline.parameters.context >>
+  #        shell:  op run --env-file op.nonprod.env -- /bin/bash -eo pipefail
+  #        source-env: op.nonprod.env
+  #        cluster: nonprod-us-east-2
+  #        filters: *on-push-main
 
-      - approve prod-us-east-1 monitors release:
-          type: approval
-          requires:
-            - update sandbox-us-east-2 monitors
-          filters: *on-push-main
+  #    - approve prod-us-east-1 monitors release:
+  #        type: approval
+  #        requires:
+  #          - update nonprod-us-east-2 monitors
+  #        filters: *on-push-main
 
-      - update-monitors:
-          name: update prod-us-east-1 monitors
-          context: << pipeline.parameters.context >>
-          shell:  op run --env-file op.prod.env -- /bin/bash -eo pipefail
-          source-env: op.prod.env
-          cluster: prod-us-east-1
-          requires:
-            - approve prod-us-east-1 monitors release
-          filters: *on-push-main
+  #    - update-monitors:
+  #        name: update prod-us-east-1 monitors
+  #        context: << pipeline.parameters.context >>
+  #        shell:  op run --env-file op.prod.env -- /bin/bash -eo pipefail
+  #        source-env: op.prod.env
+  #        cluster: prod-us-east-1
+  #        requires:
+  #          - approve prod-us-east-1 monitors release
+  #        filters: *on-push-main
 
-  deploy servicemesh dashboard:
-    jobs:
-      - update-dashboard:
-          name: update sandbox-us-east-2 dashboard
-          context: << pipeline.parameters.context >>
-          shell: op run --env-file=op.nonprod.env -- /bin/bash -eo pipefail
-          filters: *on-push-main
+  #deploy servicemesh dashboard:
+  #  jobs:
+  #    - update-dashboard:
+  #        name: update nonprod-us-east-2 dashboard
+  #        context: << pipeline.parameters.context >>
+  #        shell: op run --env-file=op.nonprod.env -- /bin/bash -eo pipefail
+  #        filters: *on-push-main
 
   nightly-validation:
     triggers:
@@ -336,18 +336,18 @@ workflows:
                 - main
     jobs:
       - validate-servicemesh:
-          name: validate sandbox-us-east-2 servicemesh
+          name: validate nonprod-us-east-2 servicemesh
           context: << pipeline.parameters.context >>
-          shell:  op run --env-file op.nonprod.env -- /bin/bash -eo pipefail
+          shell: op run --env-file op.nonprod.env -- /bin/bash -eo pipefail
           source-env: op.nonprod.env
-          cluster: sandbox-us-east-2
-      - validate-servicemesh:
-          name: validate prod-us-east-1 servicemesh
-          context: << pipeline.parameters.context >>
-          shell:  op run --env-file op.prod.env -- /bin/bash -eo pipefail
-          source-env: op.prod.env
-          cluster: prod-us-east-1
-      - update-dashboard:
-          name: refresh eks-servicemesh dashboard
-          context: << pipeline.parameters.context >>
-          shell:  op run --env-file op.nonprod.env -- /bin/bash -eo pipefail
+          cluster: nonprod-us-east-2
+    #  - validate-servicemesh:
+    #      name: validate prod-us-east-1 servicemesh
+    #      context: << pipeline.parameters.context >>
+    #      shell:  op run --env-file op.prod.env -- /bin/bash -eo pipefail
+    #      source-env: op.prod.env
+    #      cluster: prod-us-east-1
+    #  - update-dashboard:
+    #      name: refresh eks-servicemesh dashboard
+    #      context: << pipeline.parameters.context >>
+    #      shell:  op run --env-file op.nonprod.env -- /bin/bash -eo pipefail
