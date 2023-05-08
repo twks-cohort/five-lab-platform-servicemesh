@@ -13,7 +13,7 @@ parameters:
   context:
     description: circleci context for all jobs
     type: string
-    default: twdps-core-labs-team
+    default: cohorts
   terraform-version:
     description: terraform version for all jobs
     type: string
